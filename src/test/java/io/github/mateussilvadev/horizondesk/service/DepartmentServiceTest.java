@@ -82,7 +82,7 @@ public class DepartmentServiceTest implements DomainAssertions {
 
         @Test
         @DisplayName("An exception should be thrown when the department name is already registered")
-        void shouldThrowExceptionWhenEmailAlreadyExists() {
+        void shouldThrowExceptionWhenNameAlreadyExists() {
             given(repository.existsByName(createDTO.name())).willReturn(true);
 
             BusinessException ex = assertThrows(BusinessException.class, () -> service.create(createDTO));
@@ -131,7 +131,7 @@ public class DepartmentServiceTest implements DomainAssertions {
 
         @Test
         @DisplayName("An exception should be thrown when the department is not found")
-        void shouldThrowExceptionWhenUserNotFound() {
+        void shouldThrowExceptionWhenDepartmentNotFound() {
             UUID uuid = UUID.randomUUID();
             given(repository.findByUuid(uuid)).willReturn(Optional.empty());
 
@@ -192,6 +192,14 @@ public class DepartmentServiceTest implements DomainAssertions {
             service.activate(uuid);
 
             assertThat(department.isActive()).isEqualTo(true);
+        }
+
+        @Test
+        @DisplayName("Should disable user successfully")
+        void shouldSuspendDepartment() {
+            Department department = mockDepartmentFound(uuid);
+            service.deactivate(uuid);
+            assertThat(department.isActive()).isEqualTo(false);
         }
 
 
