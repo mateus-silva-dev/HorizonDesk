@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: horizondesk
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_DEV_URL}
+    username: ${DB_DEV_USER}
+    password: ${DB_DEV_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    root: INFO
+    com.horizondesk.api: DEBUG
+
+springdoc:
+  swagger-ui:
+    path: /docs-horizondesk.html
+  api-docs:
+    path: /api-horizondesk
+
+docflow:
+  title: HorizonDesk API
+  version: 1.0.0
+  description: A Help Desk Management API built with Java and Spring Boot.
+  default-error-schema: io.github.mateussilvadev.horizondesk.exception.StandardError
