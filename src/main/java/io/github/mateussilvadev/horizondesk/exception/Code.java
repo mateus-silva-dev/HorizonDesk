@@ -1,0 +1,11 @@
+package io.github.mateussilvadev.horizondesk.exception;
+
+public enum Code {
+    INTERNAL_SERVER_ERROR,
+    BUSINESS_RULE,
+    VALIDATION_ERROR,
+    EMAIL_ALREADY_REGISTERED,
+    ENTITY_NOT_FOUND,
+    DEPARTMENT_ALREADY_REGISTERED,
+    MALFORMED_JSON
+}
