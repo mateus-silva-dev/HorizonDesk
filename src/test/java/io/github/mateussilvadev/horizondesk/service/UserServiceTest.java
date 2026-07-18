@@ -373,7 +373,6 @@ public class UserServiceTest implements DomainAssertions {
         @Test
         @DisplayName("Should activate user successfully")
         void shouldActivateUser() {
-            // Cria um usuário DISABLED para podermos ativar
             User user = UserBuilder.anUser().withUuid(uuid).withStatus(StatusUser.DISABLED).build();
             given(repository.findByUuid(uuid)).willReturn(Optional.of(user));
 
@@ -385,10 +384,8 @@ public class UserServiceTest implements DomainAssertions {
         @Test
         @DisplayName("Should disable user successfully")
         void shouldSuspendUser() {
-            User user = mockUserFound(uuid); // Cria usuário ACTIVE
-
+            User user = mockUserFound(uuid);
             service.deactivate(uuid);
-
             assertThat(user.getStatus()).isEqualTo(StatusUser.DISABLED);
         }
 
