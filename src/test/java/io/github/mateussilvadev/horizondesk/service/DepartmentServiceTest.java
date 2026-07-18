@@ -1,11 +1,17 @@
 package io.github.mateussilvadev.horizondesk.service;
 
 import io.github.mateussilvadev.horizondesk.builder.DepartmentBuilder;
-import io.github.mateussilvadev.horizondesk.dto.request.DepartmentCreateDTO;
+import io.github.mateussilvadev.horizondesk.builder.UserBuilder;
+import io.github.mateussilvadev.horizondesk.dto.request.DepartmentRequestDTOs;
 import io.github.mateussilvadev.horizondesk.exception.BusinessException;
 import io.github.mateussilvadev.horizondesk.exception.EntityNotFoundException;
 import io.github.mateussilvadev.horizondesk.model.domain.Department;
+import io.github.mateussilvadev.horizondesk.model.domain.User;
+import io.github.mateussilvadev.horizondesk.model.enums.Role;
+import io.github.mateussilvadev.horizondesk.model.enums.StatusUser;
 import io.github.mateussilvadev.horizondesk.repository.DepartmentRepository;
+import io.github.mateussilvadev.horizondesk.support.DomainAssertions;
+import org.awaitility.core.DeadlockException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,33 +20,38 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static io.github.mateussilvadev.horizondesk.exception.Code.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 @DisplayName("Department service test")
-public class DepartmentServiceTest {
+@ExtendWith(MockitoExtension.class)
+public class DepartmentServiceTest implements DomainAssertions {
 
     @Mock
     private DepartmentRepository repository;
 
     @InjectMocks
     private DepartmentService service;
-    private DepartmentCreateDTO createDTO;
+    private DepartmentRequestDTOs.Create createDTO;
     private final UUID uuid = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
-        createDTO = new DepartmentCreateDTO("Technical Support");
+        createDTO = new DepartmentRequestDTOs.Create("Technical Support");
+        service = new DepartmentService(repository);
     }
 
     private Department mockDepartmentFound(UUID uuid) {
@@ -62,7 +73,9 @@ public class DepartmentServiceTest {
             var answer = service.create(createDTO);
 
             assertThat(answer).isNotNull();
-            assertThat(answer).extracting("name").isEqualTo(createDTO.name());
+            assertThat(answer)
+                    .extracting("name")
+                    .isEqualTo(createDTO.name());
 
             verify(repository).save(answer);
         }
@@ -111,6 +124,40 @@ public class DepartmentServiceTest {
             assertThat(ex.getMessage()).isEqualTo("department_service.error.department_not_found");
 
             verify(repository).findByUuid(uuid);
+        }
+
+        @Test
+        @DisplayName("Should return page of departments successfully")
+        void shouldReturnPageOfDepartments() {
+            Pageable pageable = PageRequest.of(0, 10);
+            Department department = DepartmentBuilder.anDepartment().build();
+
+            Page<Department> mockPage = new PageImpl<>(List.of(department), pageable, 1);
+
+            when(repository.findAll(any(Pageable.class))).thenReturn(mockPage);
+
+            Page<Department> result = service.findAll(pageable);
+
+            assertThat(result).isNotNull();
+            assertThat(result.getContent()).hasSize(1);
+            assertThat(result.getTotalElements()).isEqualTo(1);
+            assertThat(result.getContent().getFirst().isActive()).isEqualTo(true);
+
+            verify(repository).findAll(pageable);
+        }
+
+        @Test
+        @DisplayName("Should return list of active departments successfully")
+        void shouldReturnListOfActiveDepartments() {
+            Department department = DepartmentBuilder.anDepartment().build();
+            List<Department> departments = List.of(department);
+
+            when(repository.findAllByActiveTrueOrderByNameAsc()).thenReturn(departments);
+
+            List<Department> result = service.findAllActiveOptions();
+
+            assertThat(result).isNotEmpty();
+            assertThat(departments.getFirst().isActive()).isTrue();
         }
 
     }
