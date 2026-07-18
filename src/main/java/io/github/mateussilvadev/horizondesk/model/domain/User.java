@@ -90,10 +90,6 @@ public class User implements Serializable {
         return new User(name, email, passwordHash, department);
     }
 
-    /**
-     * Métodos de alteração de dados (Name, E-mail e Password).
-     */
-
     public void changeName(String newName) {
         ensureEditable();
         String validateName = checkName(newName);
@@ -159,9 +155,6 @@ public class User implements Serializable {
         this.status = StatusUser.EXCLUDED;
     }
 
-    /**
-     * Métodos privados de checagem de dados (Name, E-mail, Password e se é Usuário ativo).
-     */
     private static String checkName(String name) {
         String validateName = CommonValidation.requiredText(name, "user.field.name", 3);
         if (!validateName.matches("^[A-Za-zÀ-ÿ.\\s'\\-]+$"))
