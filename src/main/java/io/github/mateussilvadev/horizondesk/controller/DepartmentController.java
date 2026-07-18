@@ -2,6 +2,7 @@ package io.github.mateussilvadev.horizondesk.controller;
 
 import io.github.docflowlib.docflow.annotations.ApiDocController;
 import io.github.docflowlib.docflow.annotations.ApiDocGet;
+import io.github.docflowlib.docflow.annotations.ApiDocPatch;
 import io.github.docflowlib.docflow.annotations.ApiDocPost;
 import io.github.mateussilvadev.horizondesk.dto.request.DepartmentRequestDTOs;
 import io.github.mateussilvadev.horizondesk.dto.response.DepartmentResponseDTOs;
@@ -47,6 +48,13 @@ public class DepartmentController {
     @ApiDocGet
     public ResponseEntity<DepartmentResponseDTOs.Response> getByUUID(@PathVariable UUID uuid) {
         Department department = service.findByUuid(uuid);
+        return ResponseEntity.ok(DepartmentMapper.toResponse(department));
+    }
+
+    @PatchMapping("/{uuid}")
+    @ApiDocPatch
+    public ResponseEntity<DepartmentResponseDTOs.Response> update(@PathVariable UUID uuid, @RequestBody DepartmentRequestDTOs.Update dto) {
+        Department department = service.update(uuid, dto.name());
         return ResponseEntity.ok(DepartmentMapper.toResponse(department));
     }
 

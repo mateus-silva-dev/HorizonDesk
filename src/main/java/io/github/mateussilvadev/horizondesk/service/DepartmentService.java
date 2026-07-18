@@ -37,6 +37,13 @@ public class DepartmentService {
                 .orElseThrow(() -> new EntityNotFoundException("department_service.error.department_not_found"));
     }
 
+    @Transactional
+    public Department update(UUID uuid, String newName) {
+        Department department = findByUuid(uuid);
+        department.changeDepartmentName(newName);
+        return department;
+    }
+
     @Transactional(readOnly = true)
     public List<Department> findAllActiveOptions() {
         return repository.findAllByActiveTrueOrderByNameAsc();
