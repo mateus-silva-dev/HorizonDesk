@@ -179,4 +179,22 @@ public class DepartmentServiceTest implements DomainAssertions {
 
     }
 
+    @Nested
+    @DisplayName("Must change department status")
+    class ChangeStatus {
+
+        @Test
+        @DisplayName("Should activate department successfully")
+        void shouldActivateDepartment() {
+            Department department = DepartmentBuilder.anDepartment().withUuid(uuid).withActive(false).build();
+            given(repository.findByUuid(uuid)).willReturn(Optional.of(department));
+
+            service.activate(uuid);
+
+            assertThat(department.isActive()).isEqualTo(true);
+        }
+
+
+    }
+
 }
