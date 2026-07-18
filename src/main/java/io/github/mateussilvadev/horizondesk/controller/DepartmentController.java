@@ -51,11 +51,19 @@ public class DepartmentController {
         return ResponseEntity.ok(DepartmentMapper.toResponse(department));
     }
 
+
     @PatchMapping("/{uuid}")
     @ApiDocPatch
     public ResponseEntity<DepartmentResponseDTOs.Response> update(@PathVariable UUID uuid, @RequestBody DepartmentRequestDTOs.Update dto) {
         Department department = service.update(uuid, dto.name());
         return ResponseEntity.ok(DepartmentMapper.toResponse(department));
+    }
+
+    @PatchMapping("/{uuid}/activate")
+    @ApiDocPatch
+    public ResponseEntity<Void> activate(@PathVariable UUID uuid) {
+        service.activate(uuid);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping

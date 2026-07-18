@@ -44,6 +44,12 @@ public class DepartmentService {
         return department;
     }
 
+    @Transactional
+    public void activate(UUID uuid) {
+        Department department = findByUuid(uuid);
+        department.activate();
+    }
+
     @Transactional(readOnly = true)
     public List<Department> findAllActiveOptions() {
         return repository.findAllByActiveTrueOrderByNameAsc();
