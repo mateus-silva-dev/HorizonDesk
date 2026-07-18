@@ -55,7 +55,7 @@ public class DepartmentServiceTest implements DomainAssertions {
     }
 
     private Department mockDepartmentFound(UUID uuid) {
-        var department = DepartmentBuilder.anDepartment().withUuid(uuid).build();
+        var department = DepartmentBuilder.anDepartment().withName("Technical Support").withUuid(uuid).build();
         given(repository.findByUuid(uuid)).willReturn(Optional.of(department));
         return department;
     }
@@ -92,6 +92,23 @@ public class DepartmentServiceTest implements DomainAssertions {
 
             verify(repository).existsByName(createDTO.name());
             verify(repository, never()).save(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("Department must update successfully")
+    class Update {
+        @Test
+        @DisplayName("Department must update successfully")
+        void shouldUpdateDepartment() {
+            Department department = mockDepartmentFound(uuid);
+            DepartmentRequestDTOs.Update updateDTO = new DepartmentRequestDTOs.Update("Sales Department");
+
+            var answer = service.update(uuid, updateDTO.name());
+
+            assertThat(answer).isNotNull();
+            assertThat(answer.getUuid()).isEqualTo(department.getUuid());
+            assertThat(answer.getName()).isEqualTo(updateDTO.name());
         }
     }
 
