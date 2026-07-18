@@ -6,6 +6,7 @@ import io.github.mateussilvadev.horizondesk.exception.Code;
 import io.github.mateussilvadev.horizondesk.exception.EntityNotFoundException;
 import io.github.mateussilvadev.horizondesk.mapper.DepartmentMapper;
 import io.github.mateussilvadev.horizondesk.model.domain.Department;
+import io.github.mateussilvadev.horizondesk.model.domain.User;
 import io.github.mateussilvadev.horizondesk.repository.DepartmentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +49,12 @@ public class DepartmentService {
     public void activate(UUID uuid) {
         Department department = findByUuid(uuid);
         department.activate();
+    }
+
+    @Transactional
+    public void deactivate(UUID uuid) {
+        Department department = findByUuid(uuid);
+        department.deactivate();
     }
 
     @Transactional(readOnly = true)

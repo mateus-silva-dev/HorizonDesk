@@ -66,6 +66,13 @@ public class DepartmentController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{uuid}/deactivate")
+    @ApiDocPatch
+    public ResponseEntity<Void> deactivate(@PathVariable UUID uuid) {
+        service.deactivate(uuid);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping
     @ApiDocGet
     public ResponseEntity<PageResponse<DepartmentResponseDTOs.Response>> getAll(
