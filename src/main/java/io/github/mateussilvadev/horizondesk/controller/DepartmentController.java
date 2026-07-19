@@ -35,19 +35,19 @@ public class DepartmentController {
 
     @PostMapping
     @ApiDocPost
-    public ResponseEntity<DepartmentResponseDTOs.Response> create(@RequestBody @Valid DepartmentRequestDTOs.Create dto) {
+    public ResponseEntity<DepartmentResponseDTOs.DepartmentResponse> create(@RequestBody @Valid DepartmentRequestDTOs.DepartmentCreate dto) {
         Department savedDepartment = service.create(dto);
-        DepartmentResponseDTOs.Response response = DepartmentMapper.toResponse(savedDepartment);
+        DepartmentResponseDTOs.DepartmentResponse departmentResponse = DepartmentMapper.toResponse(savedDepartment);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{uuid}")
-                .buildAndExpand(response.uuid())
+                .buildAndExpand(departmentResponse.uuid())
                 .toUri();
-        return ResponseEntity.created(uri).body(response);
+        return ResponseEntity.created(uri).body(departmentResponse);
     }
 
     @GetMapping("/{uuid}")
     @ApiDocGet
-    public ResponseEntity<DepartmentResponseDTOs.Response> getByUUID(@PathVariable UUID uuid) {
+    public ResponseEntity<DepartmentResponseDTOs.DepartmentResponse> getByUUID(@PathVariable UUID uuid) {
         Department department = service.findByUuid(uuid);
         return ResponseEntity.ok(DepartmentMapper.toResponse(department));
     }
@@ -55,7 +55,7 @@ public class DepartmentController {
 
     @PatchMapping("/{uuid}")
     @ApiDocPatch
-    public ResponseEntity<DepartmentResponseDTOs.Response> update(@PathVariable UUID uuid, @Valid @RequestBody DepartmentRequestDTOs.Update dto) {
+    public ResponseEntity<DepartmentResponseDTOs.DepartmentResponse> update(@PathVariable UUID uuid, @Valid @RequestBody DepartmentRequestDTOs.DepartmentUpdate dto) {
         Department department = service.update(uuid, dto.name());
         return ResponseEntity.ok(DepartmentMapper.toResponse(department));
     }
@@ -76,7 +76,7 @@ public class DepartmentController {
 
     @GetMapping
     @ApiDocGet
-    public ResponseEntity<PageResponse<DepartmentResponseDTOs.Response>> getAll(
+    public ResponseEntity<PageResponse<DepartmentResponseDTOs.DepartmentResponse>> getAll(
             @PageableDefault(size = 20, sort = "name") Pageable page) {
         Page<Department> pagedDepartments = service.findAll(page);
         return ResponseEntity.ok(DepartmentMapper.toPageResponse(pagedDepartments));
@@ -84,7 +84,7 @@ public class DepartmentController {
 
     @GetMapping("/options")
     @ApiDocGet
-    public ResponseEntity<List<DepartmentResponseDTOs.Options>> getActiveOptions() {
+    public ResponseEntity<List<DepartmentResponseDTOs.DepartmentOptions>> getActiveOptions() {
         List<Department> departments = service.findAllActiveOptions();
         return ResponseEntity.ok(
                 departments.stream()

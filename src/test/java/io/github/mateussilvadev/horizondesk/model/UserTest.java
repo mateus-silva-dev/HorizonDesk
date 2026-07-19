@@ -43,7 +43,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("User creation tests")
-    class Create {
+    class DepartmentUserTicketCreate {
         @Test
         @DisplayName("Should validate initial entity state match builder inputs")
         void shouldCreateUserWithValidState() {
@@ -95,7 +95,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update name workflow tests")
-    class UpdateName {
+    class DepartmentUserUpdateName {
         @Test
         @DisplayName("Should successfully update name and normalize spacing/casing")
         void shouldUpdateNameWithValidInput() {
@@ -113,7 +113,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update email workflow tests")
-    class UpdateEmail {
+    class DepartmentUserUpdateEmail {
 
         @Test
         @DisplayName("Should successfully update email and normalize casing")
@@ -132,7 +132,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update password workflow tests")
-    class UpdatePassword {
+    class DepartmentUserUpdatePassword {
 
         String newPasswordHash = faker.credentials().password();
 
@@ -155,7 +155,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update department workflow tests")
-    class UpdateDepartment {
+    class DepartmentUserUpdateDepartment {
 
         @Test
         @DisplayName("Should successfully update linked department entity")
@@ -173,7 +173,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update status workflow tests")
-    class UpdateStatus {
+    class DepartmentUserUpdateStatus {
 
         private static final LocalDateTime NOW = LocalDateTime.of(2026, 7, 15, 10, 0);
         private User user;
@@ -321,7 +321,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update role workflow tests")
-    class UpdateRole {
+    class DepartmentUserUpdateRole {
 
         private void prepareRole(User user, Role role) {
             ReflectionTestUtils.setField(user, "role", role);

@@ -9,7 +9,7 @@ public final class UserRequestDTOs {
 
     private UserRequestDTOs() { }
 
-    public record Create(
+    public record UserCreate(
             @NotNull(message = "Name is required.")
             @NotBlank(message = "Name is required.")
             @Size(min = 3, max = 50, message = "The name must contain at least 3 characters.")
@@ -29,7 +29,7 @@ public final class UserRequestDTOs {
             @NotNull(message = "Department is required.")
             UUID departmentUuid) { }
 
-    public record Update(
+    public record UserUpdate(
             @Size(min = 3, max = 50, message = "The name must contain at least 3 characters.")
             @Pattern(regexp = "^[a-zA-ZÀ-ÿ0-9\\s]*$", message = "Invalid characters in name.")
             String name,

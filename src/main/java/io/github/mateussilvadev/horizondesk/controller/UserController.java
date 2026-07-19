@@ -34,19 +34,19 @@ public class UserController {
 
     @PostMapping
     @ApiDocPost
-    public ResponseEntity<UserResponseDTOs.Response> createUser(@Valid @RequestBody UserRequestDTOs.Create dto) {
+    public ResponseEntity<UserResponseDTOs.UserResponse> createUser(@Valid @RequestBody UserRequestDTOs.UserCreate dto) {
         User savedUser = userService.create(dto);
-        UserResponseDTOs.Response response = UserMapper.toResponse(savedUser);
+        UserResponseDTOs.UserResponse userResponse = UserMapper.toResponse(savedUser);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{uuid}")
-                .buildAndExpand(response.uuid())
+                .buildAndExpand(userResponse.uuid())
                 .toUri();
-        return ResponseEntity.created(uri).body(response);
+        return ResponseEntity.created(uri).body(userResponse);
     }
 
     @GetMapping("/{uuid}")
     @ApiDocGet
-    public ResponseEntity<UserResponseDTOs.Response> getByUUID(@PathVariable UUID uuid) {
+    public ResponseEntity<UserResponseDTOs.UserResponse> getByUUID(@PathVariable UUID uuid) {
         User user = userService.findByUuid(uuid);
         return ResponseEntity.ok(UserMapper.toResponse(user));
     }
@@ -54,7 +54,7 @@ public class UserController {
 
     @PatchMapping("/{uuid}")
     @ApiDocPatch
-    public ResponseEntity<UserResponseDTOs.Response> updateUser(@PathVariable UUID uuid, @Valid @RequestBody UserRequestDTOs.Update dto) {
+    public ResponseEntity<UserResponseDTOs.UserResponse> updateUser(@PathVariable UUID uuid, @Valid @RequestBody UserRequestDTOs.UserUpdate dto) {
         User user = userService.updateUser(uuid, dto);
         return ResponseEntity.ok(UserMapper.toResponse(user));
     }

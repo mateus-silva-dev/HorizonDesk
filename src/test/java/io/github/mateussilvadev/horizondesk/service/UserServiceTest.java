@@ -61,7 +61,7 @@ public class UserServiceTest implements DomainAssertions {
     private UserService service;
 
     @InjectMocks
-    private UserRequestDTOs.Create createDTO;
+    private UserRequestDTOs.UserCreate userCreateDTO;
     private final UUID uuid = UUID.randomUUID();
 
     @BeforeEach
@@ -69,7 +69,7 @@ public class UserServiceTest implements DomainAssertions {
         Clock fixedClock = Clock.fixed(
                 FIXED_DATE.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault());
 
-        createDTO = new UserRequestDTOs.Create(
+        userCreateDTO = new UserRequestDTOs.UserCreate(
                 faker.name().fullName(),
                 faker.internet().emailAddress(),
                 faker.credentials().password(8, 20),
@@ -87,25 +87,25 @@ public class UserServiceTest implements DomainAssertions {
 
     @Nested
     @DisplayName("User creation test")
-    class Create {
+    class DepartmentUserTicketCreate {
 
         @Test
         @DisplayName("Create should save user")
         void shouldSaveUser() {
             Department mockDepartment = Department.create("Sales Department");
 
-            given(repository.existsByEmail(createDTO.email())).willReturn(false);
-            given(departmentRepository.findByUuid(createDTO.departmentUuid()))
+            given(repository.existsByEmail(userCreateDTO.email())).willReturn(false);
+            given(departmentRepository.findByUuid(userCreateDTO.departmentUuid()))
                     .willReturn(Optional.of(mockDepartment));
-            given(passwordEncoder.encode(createDTO.password())).willReturn(createDTO.password());
+            given(passwordEncoder.encode(userCreateDTO.password())).willReturn(userCreateDTO.password());
             given(repository.save(any())).willAnswer(i -> i.getArgument(0));
 
-            var answer = service.create(createDTO);
+            var answer = service.create(userCreateDTO);
 
             assertThat(answer).isNotNull();
             assertThat(answer)
                     .extracting("name", "email", "passwordHash", "department")
-                    .containsExactly(createDTO.name(), createDTO.email(), createDTO.password(), mockDepartment);
+                    .containsExactly(userCreateDTO.name(), userCreateDTO.email(), userCreateDTO.password(), mockDepartment);
 
             verify(repository).save(answer);
         }
@@ -113,30 +113,30 @@ public class UserServiceTest implements DomainAssertions {
         @Test
         @DisplayName("An exception should be thrown when the email address is already registered")
         void shouldThrowExceptionWhenEmailAlreadyExists() {
-            given(repository.existsByEmail(createDTO.email())).willReturn(true);
+            given(repository.existsByEmail(userCreateDTO.email())).willReturn(true);
 
-            BusinessException ex = assertThrows(BusinessException.class, () -> service.create(createDTO));
+            BusinessException ex = assertThrows(BusinessException.class, () -> service.create(userCreateDTO));
 
             assertThat(ex.getCode()).isEqualTo(EMAIL_ALREADY_REGISTERED);
             assertThat(ex.getMessage()).isEqualTo("user_service.error.email_already_registered");
 
-            verify(repository).existsByEmail(createDTO.email());
+            verify(repository).existsByEmail(userCreateDTO.email());
             verify(repository, never()).save(any());
         }
 
         @Test
         @DisplayName("An exception should be thrown when the department don't exists")
         void shouldThrowExceptionWhenDepartmentDoesNotExist() {
-            given(repository.existsByEmail(createDTO.email())).willReturn(false);
-            given(departmentRepository.findByUuid(createDTO.departmentUuid())).willReturn(Optional.empty());
+            given(repository.existsByEmail(userCreateDTO.email())).willReturn(false);
+            given(departmentRepository.findByUuid(userCreateDTO.departmentUuid())).willReturn(Optional.empty());
 
-            EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> service.create(createDTO));
+            EntityNotFoundException ex = assertThrows(EntityNotFoundException.class, () -> service.create(userCreateDTO));
 
             assertThat(ex.getCode()).isEqualTo(ENTITY_NOT_FOUND);
             assertThat(ex.getMessage()).isEqualTo("user_service.error.department_not_found");
 
-            verify(repository).existsByEmail(createDTO.email());
-            verify(departmentRepository).findByUuid(createDTO.departmentUuid());
+            verify(repository).existsByEmail(userCreateDTO.email());
+            verify(departmentRepository).findByUuid(userCreateDTO.departmentUuid());
             verify(repository, never()).save(any());
         }
 
@@ -201,19 +201,19 @@ public class UserServiceTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update test for users")
-    class Update {
+    class DepartmentUserUpdate {
 
         @Test
         @DisplayName("User must update successfully")
         void shouldUpdateUser() {
             User user = mockUserFound(uuid);
-            UserRequestDTOs.Update updateDTO = new UserRequestDTOs.Update(faker.name().fullName(), faker.internet().emailAddress());
+            UserRequestDTOs.UserUpdate userUpdateDTO = new UserRequestDTOs.UserUpdate(faker.name().fullName(), faker.internet().emailAddress());
 
-            var answer = service.updateUser(uuid, updateDTO);
+            var answer = service.updateUser(uuid, userUpdateDTO);
 
             assertThat(answer).isNotNull();
-            assertThat(answer.getName()).isEqualTo(updateDTO.name());
-            assertThat(answer.getEmail()).isEqualTo(updateDTO.email());
+            assertThat(answer.getName()).isEqualTo(userUpdateDTO.name());
+            assertThat(answer.getEmail()).isEqualTo(userUpdateDTO.email());
         }
 
         @Test
@@ -221,11 +221,11 @@ public class UserServiceTest implements DomainAssertions {
         void shouldUpdateOnlyName() {
             User user = mockUserFound(uuid);
             String originalEmail = user.getEmail();
-            UserRequestDTOs.Update updateDTO = new UserRequestDTOs.Update(faker.name().fullName(), null);
+            UserRequestDTOs.UserUpdate userUpdateDTO = new UserRequestDTOs.UserUpdate(faker.name().fullName(), null);
 
-            var answer = service.updateUser(uuid, updateDTO);
+            var answer = service.updateUser(uuid, userUpdateDTO);
 
-            assertThat(answer.getName()).isEqualTo(updateDTO.name());
+            assertThat(answer.getName()).isEqualTo(userUpdateDTO.name());
             assertThat(answer.getEmail()).isEqualTo(originalEmail);
         }
 
@@ -234,18 +234,18 @@ public class UserServiceTest implements DomainAssertions {
         void shouldUpdateOnlyEmail() {
             User user = mockUserFound(uuid);
             String originalName = user.getName();
-            UserRequestDTOs.Update updateDTO = new UserRequestDTOs.Update(null, faker.internet().emailAddress());
+            UserRequestDTOs.UserUpdate userUpdateDTO = new UserRequestDTOs.UserUpdate(null, faker.internet().emailAddress());
 
-            var answer = service.updateUser(uuid, updateDTO);
+            var answer = service.updateUser(uuid, userUpdateDTO);
 
             assertThat(answer.getName()).isEqualTo(originalName);
-            assertThat(answer.getEmail()).isEqualTo(updateDTO.email());
+            assertThat(answer.getEmail()).isEqualTo(userUpdateDTO.email());
         }
     }
 
     @Nested
     @DisplayName("update password test for users")
-    class UpdatePassword {
+    class DepartmentUserUpdatePassword {
 
         private UserRequestDTOs.UpdatePassword userUpdatePasswordDTO;
         private String newPassword;
