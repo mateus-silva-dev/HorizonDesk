@@ -151,8 +151,10 @@ public class UserControllerTest {
             var request = new UserRequestDTOs.Create(FAKER.name().fullName(), "email@test.com",
                     FAKER.credentials().password(8, 20), UUID.fromString("b85a4dd5-0866-40d2-9688-c5ba16ce9b5e"));
 
+            String dbMockedMessage = "ERROR: duplicate key value violates unique constraint \"uk6dotkott2kjsp8vw4d0m25fb7\"";
+
             given(userService.create(any()))
-                    .willThrow(new DataIntegrityViolationException("user_service.error.email_already_registered"));
+                    .willThrow(new DataIntegrityViolationException(dbMockedMessage));
 
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
