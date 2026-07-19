@@ -10,6 +10,7 @@ import io.github.mateussilvadev.horizondesk.dto.response.PageResponse;
 import io.github.mateussilvadev.horizondesk.mapper.DepartmentMapper;
 import io.github.mateussilvadev.horizondesk.model.domain.Department;
 import io.github.mateussilvadev.horizondesk.service.DepartmentService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -34,7 +35,7 @@ public class DepartmentController {
 
     @PostMapping
     @ApiDocPost
-    public ResponseEntity<DepartmentResponseDTOs.Response> create(@RequestBody DepartmentRequestDTOs.Create dto) {
+    public ResponseEntity<DepartmentResponseDTOs.Response> create(@RequestBody @Valid DepartmentRequestDTOs.Create dto) {
         Department savedDepartment = service.create(dto);
         DepartmentResponseDTOs.Response response = DepartmentMapper.toResponse(savedDepartment);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -54,7 +55,7 @@ public class DepartmentController {
 
     @PatchMapping("/{uuid}")
     @ApiDocPatch
-    public ResponseEntity<DepartmentResponseDTOs.Response> update(@PathVariable UUID uuid, @RequestBody DepartmentRequestDTOs.Update dto) {
+    public ResponseEntity<DepartmentResponseDTOs.Response> update(@PathVariable UUID uuid, @Valid @RequestBody DepartmentRequestDTOs.Update dto) {
         Department department = service.update(uuid, dto.name());
         return ResponseEntity.ok(DepartmentMapper.toResponse(department));
     }
