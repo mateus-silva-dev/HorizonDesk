@@ -41,6 +41,7 @@ public class DepartmentService {
     @Transactional
     public Department update(UUID uuid, String newName) {
         Department department = findByUuid(uuid);
+        checkDepartmentExists(newName);
         department.changeDepartmentName(newName);
         return department;
     }
