@@ -43,14 +43,23 @@ public class GlobalExceptionHandler {
 
         String rootMsg = ex.getMostSpecificCause().getMessage();
 
-        if (rootMsg != null && (rootMsg.contains("uk6dotkott2kjsp8vw4d0m25fb7") || rootMsg.contains("email"))) {
+        String rootMsgLower = rootMsg != null ? rootMsg.toLowerCase() : "";
 
+        if (rootMsg != null && (rootMsg.contains("uk6dotkott2kjsp8vw4d0m25fb7"))) {
             String localizedMessage = messageSource.getMessage(
-                    "user_service.error.email_already_registered", null, "user_service.error.email_already_registered", LocaleContextHolder.getLocale());
-
+                    "user_service.error.email_already_registered", null,
+                    "user_service.error.email_already_registered", LocaleContextHolder.getLocale());
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(StandardError.simple(Code.EMAIL_ALREADY_REGISTERED, HttpStatus.CONFLICT.value(), localizedMessage));
+        }
+        else if (rootMsgLower.contains("ukj6cwks7xecs5jov19ro8ge3qk")) {
+            String localizedMessage = messageSource.getMessage(
+                    "department_service.error.department_already_registered", null,
+                    "department_service.error.department_already_registered", LocaleContextHolder.getLocale());
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(StandardError.simple(Code.DEPARTMENT_ALREADY_REGISTERED, HttpStatus.CONFLICT.value(), localizedMessage));
         }
 
         return ResponseEntity
@@ -89,6 +98,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<StandardError> handleBusiness(BusinessException ex, HttpServletRequest request) {
         log.warn("Business error occurred | Method: {} | Path: {}", request.getMethod(), request.getRequestURI());
 
+        Object[] args = ex.getArgs();
+
+        if (args != null && args.length > 0 && args[0] instanceof String fieldKey)
+            args[0] = messageSource.getMessage(fieldKey, null, fieldKey, LocaleContextHolder.getLocale());
+
         String localizedMessage = messageSource.getMessage(
                 ex.getMessage(), null, ex.getMessage(), LocaleContextHolder.getLocale());
 
@@ -112,6 +126,5 @@ public class GlobalExceptionHandler {
                 .status(status)
                 .body(StandardError.simple(Code.ENTITY_NOT_FOUND, status.value(), localizedMessage));
     }
-
 
 }

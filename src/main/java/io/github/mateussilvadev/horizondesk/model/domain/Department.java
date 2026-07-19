@@ -13,6 +13,7 @@ import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -43,6 +44,10 @@ public class Department {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
     @CreatedBy
     private String createdBy;
 
@@ -58,9 +63,6 @@ public class Department {
         return new Department(name);
     }
 
-    /**
-     * Métodos de alteração de dados (Name, E-mail e Password).
-     */
 
     public void changeDepartmentName(String newName) {
         checkActive();
@@ -78,10 +80,6 @@ public class Department {
         if (!this.active) return;
         this.active = false;
     }
-
-    /**
-     * Métodos privados de checagem de dados (Name, E-mail, Password e se é Usuário ativo).
-     */
 
     private void checkActive() {
         if (!this.active) throw new BusinessException(Code.BUSINESS_RULE, "department.error.inactive");

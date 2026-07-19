@@ -70,7 +70,7 @@ public class UserControllerTest {
         given(userService.findByUuid(any(UUID.class)))
                 .willThrow(new RuntimeException("error.internal_server_error"));
 
-        mockMvc.perform(get("/api/v1/users/{uuid}", randomUuid))
+        mockMvc.perform(get(BASE_URL + "/{uuid}", randomUuid))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.code").value(Code.INTERNAL_SERVER_ERROR.toString()));
     }
@@ -83,7 +83,7 @@ public class UserControllerTest {
         given(userService.create(any(UserRequestDTOs.Create.class))).willThrow(
                 new BusinessException(Code.MALFORMED_JSON, "error.invalid_json"));
 
-        mockMvc.perform(post("/api/v1/users")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -95,7 +95,7 @@ public class UserControllerTest {
     void shouldReturn422WhenAnyDataIsInvalid() throws Exception {
         var request = new UserRequestDTOs.Create("John Doe", "email-invalid", "password123", UUID.randomUUID());
 
-        mockMvc.perform(post("/api/v1/users")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnprocessableContent())
@@ -111,13 +111,13 @@ public class UserControllerTest {
         given(userService.findByUuid(randomUuid))
                 .willThrow(new EntityNotFoundException("user_service.error.user_not_found"));
 
-        mockMvc.perform(get("/api/v1/users/{uuid}", randomUuid))
+        mockMvc.perform(get(BASE_URL + "/{uuid}", randomUuid))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value(Code.ENTITY_NOT_FOUND.toString()));
     }
 
     @Nested
-    @DisplayName("/api/v1/users")
+    @DisplayName("Create user")
     class Create {
         @Test
         @DisplayName("Should create user and return 201")
@@ -154,7 +154,7 @@ public class UserControllerTest {
             given(userService.create(any()))
                     .willThrow(new DataIntegrityViolationException("user_service.error.email_already_registered"));
 
-            mockMvc.perform(post("/api/v1/users")
+            mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(request)))
                     .andExpect(status().isConflict())
@@ -168,7 +168,7 @@ public class UserControllerTest {
         var user = UserBuilder.anUser().withUuid(uuid).build();
         given(userService.findByUuid(uuid)).willReturn(user);
 
-        mockMvc.perform(get("/api/v1/users/{uuid}", uuid))
+        mockMvc.perform(get(BASE_URL + "/{uuid}", uuid))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.uuid").value(user.getUuid().toString()));
     }
@@ -181,7 +181,7 @@ public class UserControllerTest {
 
         given(userService.updateUser(eq(uuid), any())).willReturn(user);
 
-        mockMvc.perform(patch("/api/v1/users/{uuid}", uuid)
+        mockMvc.perform(patch(BASE_URL + "/{uuid}", uuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
@@ -193,7 +193,7 @@ public class UserControllerTest {
     void shouldUpdatePassword() throws Exception {
         var dto = new UserRequestDTOs.UpdatePassword("12345678", "senha@123", "senha@123");
 
-        mockMvc.perform(patch("/api/v1/users/{uuid}/password", uuid)
+        mockMvc.perform(patch(BASE_URL + "/{uuid}/password", uuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNoContent());
@@ -203,7 +203,7 @@ public class UserControllerTest {
     @ValueSource(strings = {"activate", "deactivate", "exclusion-request"})
     @DisplayName("Should return 204 when changing user status")
     void shouldReturn204WhenChangingStatus(String action) throws Exception {
-        mockMvc.perform(patch("/api/v1/users/{uuid}/" + action, uuid))
+        mockMvc.perform(patch(BASE_URL + "/{uuid}/" + action, uuid))
                 .andExpect(status().isNoContent());
     }
 
@@ -212,7 +212,7 @@ public class UserControllerTest {
     void shouldChangeRole() throws Exception {
         var dto = new UserRequestDTOs.ChangeRole(Role.ROLE_ADMIN);
 
-        mockMvc.perform(patch("/api/v1/users/{uuid}/role", uuid)
+        mockMvc.perform(patch(BASE_URL + "/{uuid}/role", uuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNoContent());
@@ -223,7 +223,7 @@ public class UserControllerTest {
     void shouldChangeDepartment() throws Exception {
         var dto = new UserRequestDTOs.ChangeDepartment(UUID.randomUUID());
 
-        mockMvc.perform(patch("/api/v1/users/{uuid}/department", uuid)
+        mockMvc.perform(patch(BASE_URL + "/{uuid}/department", uuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isNoContent());
@@ -235,7 +235,7 @@ public class UserControllerTest {
         Page<User> page = new PageImpl<>(List.of(UserBuilder.anUser().build()));
         given(userService.findAllActiveTechnicians(any(Pageable.class))).willReturn(page);
 
-        mockMvc.perform(get("/api/v1/users/technicians")
+        mockMvc.perform(get(BASE_URL + "/technicians")
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())

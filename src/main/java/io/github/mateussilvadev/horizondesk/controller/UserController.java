@@ -105,7 +105,7 @@ public class UserController {
 
     @GetMapping("/technicians")
     @ApiDocGet
-    public ResponseEntity<PageResponse<UserResponseDTOs.TechnicianOption>> getAllActiveTechnicians(
+    public ResponseEntity<PageResponse<UserResponseDTOs.TechnicianOption>> getActiveTechnicians(
             @PageableDefault(size = 20, sort = "name") Pageable pageable) {
         Page<User> page =
                 userService.findAllActiveTechnicians(pageable);

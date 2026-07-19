@@ -173,6 +173,30 @@ public class UserServiceTest implements DomainAssertions {
             verify(repository).findByUuid(uuid);
         }
 
+        @Test
+        @DisplayName("Should return page of active technicians successfully")
+        void shouldReturnPageOfActiveTechnicians() {
+            Pageable pageable = PageRequest.of(0, 10);
+            User technician = UserBuilder.anUser().withRole(Role.ROLE_TECHNICIAN).build();
+
+            Page<User> mockPage = new PageImpl<>(List.of(technician), pageable, 1);
+
+            given(repository.findAllByRoleAndStatus(
+                    eq(Role.ROLE_TECHNICIAN),
+                    eq(StatusUser.ACTIVE),
+                    eq(pageable))).willReturn(mockPage);
+
+            Page<User> result = service.findAllActiveTechnicians(pageable);
+
+            assertThat(result).isNotNull();
+            assertThat(result.getContent()).hasSize(1);
+            assertThat(result.getTotalElements()).isEqualTo(1);
+            assertThat(result.getContent().getFirst().getRole()).isEqualTo(Role.ROLE_TECHNICIAN);
+            assertThat(result.getContent().getFirst().getStatus()).isEqualTo(StatusUser.ACTIVE);
+
+            verify(repository).findAllByRoleAndStatus(Role.ROLE_TECHNICIAN, StatusUser.ACTIVE, pageable);
+        }
+
     }
 
     @Nested
@@ -349,7 +373,6 @@ public class UserServiceTest implements DomainAssertions {
         @Test
         @DisplayName("Should activate user successfully")
         void shouldActivateUser() {
-            // Cria um usuário DISABLED para podermos ativar
             User user = UserBuilder.anUser().withUuid(uuid).withStatus(StatusUser.DISABLED).build();
             given(repository.findByUuid(uuid)).willReturn(Optional.of(user));
 
@@ -361,10 +384,8 @@ public class UserServiceTest implements DomainAssertions {
         @Test
         @DisplayName("Should disable user successfully")
         void shouldSuspendUser() {
-            User user = mockUserFound(uuid); // Cria usuário ACTIVE
-
+            User user = mockUserFound(uuid);
             service.deactivate(uuid);
-
             assertThat(user.getStatus()).isEqualTo(StatusUser.DISABLED);
         }
 
@@ -377,35 +398,6 @@ public class UserServiceTest implements DomainAssertions {
 
             assertThat(user.getStatus()).isEqualTo(StatusUser.PENDING_EXCLUSION);
             assertThat(user.getScheduledExclusionAt()).isEqualTo(FIXED_DATE.plusDays(7));
-        }
-    }
-
-    @Nested
-    @DisplayName("Find all technicians")
-    class FindAllTechnicians {
-
-        @Test
-        @DisplayName("Should return page of active technicians successfully")
-        void shouldReturnPageOfActiveTechnicians() {
-            Pageable pageable = PageRequest.of(0, 10);
-            User technician = UserBuilder.anUser().withRole(Role.ROLE_TECHNICIAN).build();
-
-            Page<User> mockPage = new PageImpl<>(List.of(technician), pageable, 1);
-
-            given(repository.findAllByRoleAndStatus(
-                    eq(Role.ROLE_TECHNICIAN),
-                    eq(StatusUser.ACTIVE),
-                    eq(pageable))).willReturn(mockPage);
-
-            Page<User> result = service.findAllActiveTechnicians(pageable);
-
-            assertThat(result).isNotNull();
-            assertThat(result.getContent()).hasSize(1);
-            assertThat(result.getTotalElements()).isEqualTo(1);
-            assertThat(result.getContent().get(0).getRole()).isEqualTo(Role.ROLE_TECHNICIAN);
-            assertThat(result.getContent().get(0).getStatus()).isEqualTo(StatusUser.ACTIVE);
-
-            verify(repository).findAllByRoleAndStatus(Role.ROLE_TECHNICIAN, StatusUser.ACTIVE, pageable);
         }
     }
 }
