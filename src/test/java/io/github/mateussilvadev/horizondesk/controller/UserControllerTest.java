@@ -117,7 +117,7 @@ public class UserControllerTest {
 
     @Nested
     @DisplayName("Create user")
-    class DepartmentUserTicketCreate {
+    class UserCreate {
         @Test
         @DisplayName("Should create user and return 201")
         void shouldCreateUser() throws Exception {

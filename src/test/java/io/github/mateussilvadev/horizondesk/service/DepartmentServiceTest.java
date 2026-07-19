@@ -57,7 +57,7 @@ public class DepartmentServiceTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Department creation test")
-    class DepartmentUserTicketCreate {
+    class DepartmentCreate {
 
         @Test
         @DisplayName("Create should save department")
@@ -92,7 +92,7 @@ public class DepartmentServiceTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Department must update successfully")
-    class DepartmentUserUpdate {
+    class DepartmentUpdate {
         @Test
         @DisplayName("Department must update successfully")
         void shouldUpdateDepartment() {

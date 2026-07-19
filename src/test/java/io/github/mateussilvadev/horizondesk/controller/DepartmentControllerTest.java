@@ -110,7 +110,7 @@ public class DepartmentControllerTest {
 
     @Nested
     @DisplayName("Create department")
-    class DepartmentUserTicketCreate {
+    class DepartmentCreate {
         @Test
         @DisplayName("Should create department and return 201")
         void shouldCreateUser() throws Exception {

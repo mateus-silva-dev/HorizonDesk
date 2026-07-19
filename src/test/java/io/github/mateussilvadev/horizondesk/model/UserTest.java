@@ -16,12 +16,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +40,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("User creation tests")
-    class DepartmentUserTicketCreate {
+    class UserCreate {
         @Test
         @DisplayName("Should validate initial entity state match builder inputs")
         void shouldCreateUserWithValidState() {
@@ -95,7 +92,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update name workflow tests")
-    class DepartmentUserUpdateName {
+    class UpdateName {
         @Test
         @DisplayName("Should successfully update name and normalize spacing/casing")
         void shouldUpdateNameWithValidInput() {
@@ -113,7 +110,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update email workflow tests")
-    class DepartmentUserUpdateEmail {
+    class UpdateEmail {
 
         @Test
         @DisplayName("Should successfully update email and normalize casing")
@@ -132,7 +129,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update password workflow tests")
-    class DepartmentUserUpdatePassword {
+    class UpdatePassword {
 
         String newPasswordHash = faker.credentials().password();
 
@@ -155,7 +152,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update department workflow tests")
-    class DepartmentUserUpdateDepartment {
+    class UpdateDepartment {
 
         @Test
         @DisplayName("Should successfully update linked department entity")
@@ -173,7 +170,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update status workflow tests")
-    class DepartmentUserUpdateStatus {
+    class UpdateStatus {
 
         private static final LocalDateTime NOW = LocalDateTime.of(2026, 7, 15, 10, 0);
         private User user;
@@ -321,7 +318,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update role workflow tests")
-    class DepartmentUserUpdateRole {
+    class UpdateRole {
 
         private void prepareRole(User user, Role role) {
             ReflectionTestUtils.setField(user, "role", role);

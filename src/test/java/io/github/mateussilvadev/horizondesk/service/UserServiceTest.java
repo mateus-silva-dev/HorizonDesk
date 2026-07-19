@@ -87,7 +87,7 @@ public class UserServiceTest implements DomainAssertions {
 
     @Nested
     @DisplayName("User creation test")
-    class DepartmentUserTicketCreate {
+    class UserCreate {
 
         @Test
         @DisplayName("Create should save user")
@@ -201,7 +201,7 @@ public class UserServiceTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update test for users")
-    class DepartmentUserUpdate {
+    class ChangeUser {
 
         @Test
         @DisplayName("User must update successfully")
@@ -245,7 +245,7 @@ public class UserServiceTest implements DomainAssertions {
 
     @Nested
     @DisplayName("update password test for users")
-    class DepartmentUserUpdatePassword {
+    class ChangePassword {
 
         private UserRequestDTOs.UpdatePassword userUpdatePasswordDTO;
         private String newPassword;

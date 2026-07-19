@@ -27,7 +27,7 @@ public class DepartmentTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Department creation tests")
-    class DepartmentUserTicketCreate {
+    class DepartmentCreate {
 
         @Test
         @DisplayName("Should validate initial entity state match builder inputs")
@@ -58,7 +58,7 @@ public class DepartmentTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Update name workflow tests")
-    class DepartmentUserUpdateName {
+    class DepartmentUpdateName {
 
         @Test
         @DisplayName("Should successfully update name and normalize spacing/casing")
