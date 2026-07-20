@@ -1,10 +1,12 @@
 package io.github.mateussilvadev.horizondesk.mapper;
 
 import io.github.mateussilvadev.horizondesk.dto.request.TicketRequestDTOs;
+import io.github.mateussilvadev.horizondesk.dto.response.PageResponse;
 import io.github.mateussilvadev.horizondesk.dto.response.TicketResponseDTOs;
 import io.github.mateussilvadev.horizondesk.model.domain.Ticket;
 import io.github.mateussilvadev.horizondesk.model.domain.User;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 
 public class TicketMapper {
 
@@ -44,5 +46,17 @@ public class TicketMapper {
     public static TicketResponseDTOs.TicketResponse toResponse(Ticket ticket) {
         if (ticket == null) return null;
         return MAPPER.map(ticket, TicketResponseDTOs.TicketResponse.class);
+    }
+
+    public static PageResponse<TicketResponseDTOs.TicketResponse> toTicketResponse(Page<Ticket> page) {
+        Page<TicketResponseDTOs.TicketResponse> mappedPage = page.map(TicketMapper::toResponse);
+        return new PageResponse<>(
+                mappedPage.getContent(),
+                mappedPage.getNumber(),
+                mappedPage.getSize(),
+                mappedPage.getTotalElements(),
+                mappedPage.getTotalPages(),
+                mappedPage.isLast()
+        );
     }
 }

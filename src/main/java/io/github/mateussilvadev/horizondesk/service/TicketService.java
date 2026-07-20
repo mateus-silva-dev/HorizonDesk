@@ -1,5 +1,6 @@
 package io.github.mateussilvadev.horizondesk.service;
 
+import io.github.mateussilvadev.horizondesk.dto.request.TicketFilter;
 import io.github.mateussilvadev.horizondesk.dto.request.TicketRequestDTOs;
 import io.github.mateussilvadev.horizondesk.exception.BusinessException;
 import io.github.mateussilvadev.horizondesk.exception.Code;
@@ -9,7 +10,11 @@ import io.github.mateussilvadev.horizondesk.model.domain.Ticket;
 import io.github.mateussilvadev.horizondesk.model.domain.User;
 import io.github.mateussilvadev.horizondesk.model.enums.PriorityTicket;
 import io.github.mateussilvadev.horizondesk.repository.TicketRepository;
+import io.github.mateussilvadev.horizondesk.repository.TicketSpecifications;
 import io.github.mateussilvadev.horizondesk.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,6 +79,12 @@ public class TicketService {
     public void closeTicket(UUID uuid) {
         Ticket ticket = findByUuid(uuid);
         ticket.close();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Ticket> findAllPaginated(TicketFilter filter, Pageable pageable) {
+        Specification<Ticket> spec = TicketSpecifications.withFilter(filter);
+        return repository.findAll(spec, pageable);
     }
 
 }

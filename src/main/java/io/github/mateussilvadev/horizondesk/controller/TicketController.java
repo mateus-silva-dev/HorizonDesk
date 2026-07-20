@@ -4,12 +4,19 @@ import io.github.docflowlib.docflow.annotations.ApiDocController;
 import io.github.docflowlib.docflow.annotations.ApiDocGet;
 import io.github.docflowlib.docflow.annotations.ApiDocPatch;
 import io.github.docflowlib.docflow.annotations.ApiDocPost;
+import io.github.mateussilvadev.horizondesk.dto.request.TicketFilter;
 import io.github.mateussilvadev.horizondesk.dto.request.TicketRequestDTOs;
+import io.github.mateussilvadev.horizondesk.dto.response.PageResponse;
 import io.github.mateussilvadev.horizondesk.dto.response.TicketResponseDTOs;
 import io.github.mateussilvadev.horizondesk.mapper.TicketMapper;
 import io.github.mateussilvadev.horizondesk.model.domain.Ticket;
 import io.github.mateussilvadev.horizondesk.service.TicketService;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -80,5 +87,17 @@ public class TicketController {
     public ResponseEntity<Void> closeTicket(@PathVariable UUID uuid) {
         service.closeTicket(uuid);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    @ApiDocGet
+    public ResponseEntity<PageResponse<TicketResponseDTOs.TicketResponse>> search(@ParameterObject TicketFilter filter,
+                                                                                  @ParameterObject @PageableDefault(
+                                                                                          size = 20,
+                                                                                          sort = {"priorityWeight", "createdAt"},
+                                                                                          direction = Sort.Direction.DESC) Pageable pageable) {
+
+        Page<Ticket> page = service.findAllPaginated(filter, pageable);
+        return ResponseEntity.ok(TicketMapper.toTicketResponse(page));
     }
 }
