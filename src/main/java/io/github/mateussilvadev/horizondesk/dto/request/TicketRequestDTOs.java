@@ -28,4 +28,8 @@ public final class TicketRequestDTOs {
             @NotNull(message = "Description is required.")
             @Size(min = 10, max = 200, message = "Description must be between 10 and 200 characters.")
             String description) { }
+
+    public record TicketChangePriority(
+            @NotNull(message = "Priority Ticket is required.")
+            PriorityTicket priorityTicket) { }
 }

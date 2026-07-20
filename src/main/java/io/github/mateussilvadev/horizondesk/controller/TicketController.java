@@ -2,6 +2,7 @@ package io.github.mateussilvadev.horizondesk.controller;
 
 import io.github.docflowlib.docflow.annotations.ApiDocController;
 import io.github.docflowlib.docflow.annotations.ApiDocGet;
+import io.github.docflowlib.docflow.annotations.ApiDocPatch;
 import io.github.docflowlib.docflow.annotations.ApiDocPost;
 import io.github.mateussilvadev.horizondesk.dto.request.TicketRequestDTOs;
 import io.github.mateussilvadev.horizondesk.dto.response.TicketResponseDTOs;
@@ -47,9 +48,16 @@ public class TicketController {
     }
 
     @PatchMapping("/{uuid}")
-    @ApiDocGet
+    @ApiDocPatch
     public ResponseEntity<TicketResponseDTOs.TicketResponse> updateTicket(@PathVariable UUID uuid, @Valid @RequestBody TicketRequestDTOs.TicketUpdate dto) {
         Ticket ticket = service.updateTicket(uuid, dto);
         return ResponseEntity.ok(TicketMapper.toResponse(ticket));
+    }
+
+    @PatchMapping("/{uuid}/priority")
+    @ApiDocPatch
+    public ResponseEntity<Void> changePriority(@PathVariable UUID uuid, @Valid @RequestBody TicketRequestDTOs.TicketChangePriority dto) {
+        service.changePriority(uuid, dto.priorityTicket());
+        return ResponseEntity.noContent().build();
     }
 }

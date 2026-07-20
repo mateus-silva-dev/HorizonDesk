@@ -5,6 +5,7 @@ import io.github.mateussilvadev.horizondesk.exception.EntityNotFoundException;
 import io.github.mateussilvadev.horizondesk.mapper.TicketMapper;
 import io.github.mateussilvadev.horizondesk.model.domain.Ticket;
 import io.github.mateussilvadev.horizondesk.model.domain.User;
+import io.github.mateussilvadev.horizondesk.model.enums.PriorityTicket;
 import io.github.mateussilvadev.horizondesk.repository.TicketRepository;
 import io.github.mateussilvadev.horizondesk.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,12 @@ public class TicketService {
         if (dto.description() != null)
             ticket.changeDescription(dto.description());
         return ticket;
+    }
+
+    @Transactional
+    public void changePriority(UUID uuid, PriorityTicket newPriority) {
+        Ticket ticket = findByUuid(uuid);
+        ticket.changePriority(newPriority);
     }
 
 }

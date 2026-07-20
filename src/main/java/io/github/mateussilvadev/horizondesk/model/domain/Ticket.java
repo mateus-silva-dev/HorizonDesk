@@ -106,8 +106,11 @@ public class Ticket implements Serializable {
         this.description = checkDescription(newDescription);
     }
 
-    public void changePriority() {
-
+    public void changePriority(PriorityTicket newPriority) {
+        ensureEditable();
+        if (this.priority.equals(newPriority)) return;
+        this.priority = CommonValidation.required(newPriority, "ticket.field.priority");
+        this.priorityWeight = newPriority.getWeight();
     }
 
     private static String checkDescription(String description) {
