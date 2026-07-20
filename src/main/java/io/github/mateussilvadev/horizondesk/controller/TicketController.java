@@ -60,4 +60,25 @@ public class TicketController {
         service.changePriority(uuid, dto.priorityTicket());
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{uuid}/assign")
+    @ApiDocPatch
+    public ResponseEntity<Void> assignTechnician(@PathVariable UUID uuid, @Valid @RequestBody TicketRequestDTOs.TicketAssignTechnician dto) {
+        service.assignTechnician(uuid, dto.technicianUuid());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{uuid}/resolve")
+    @ApiDocPatch
+    public ResponseEntity<Void> resolveTicket(@PathVariable UUID uuid) {
+        service.resolveTicket(uuid);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{uuid}/close")
+    @ApiDocPatch
+    public ResponseEntity<Void> closeTicket(@PathVariable UUID uuid) {
+        service.closeTicket(uuid);
+        return ResponseEntity.noContent().build();
+    }
 }

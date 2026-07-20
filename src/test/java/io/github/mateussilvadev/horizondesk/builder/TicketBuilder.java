@@ -26,7 +26,7 @@ public class TicketBuilder {
     private StatusTicket status = StatusTicket.OPEN;
     private User requester;
     private Department department;
-    private User technician;
+    private User assignedTechnician;
 
     private TicketBuilder() {
         this.department = Department.create("TI TEST");
@@ -81,8 +81,8 @@ public class TicketBuilder {
         return this;
     }
 
-    public TicketBuilder withTechnician(User technician) {
-        this.technician = technician;
+    public TicketBuilder withAssignedTechnician(User assignedTechnician) {
+        this.assignedTechnician = assignedTechnician;
         return this;
     }
 
@@ -95,7 +95,7 @@ public class TicketBuilder {
         ReflectionTestUtils.setField(ticket, "status", this.status);
         ReflectionTestUtils.setField(ticket, "priorityWeight", this.priorityWeight);
         ReflectionTestUtils.setField(ticket, "department", this.department);
-        ReflectionTestUtils.setField(ticket, "technician", this.technician);
+        ReflectionTestUtils.setField(ticket, "assignedTechnician", this.assignedTechnician);
 
         return ticket;
     }

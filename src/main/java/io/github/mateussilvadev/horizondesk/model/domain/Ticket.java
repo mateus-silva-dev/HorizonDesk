@@ -3,6 +3,7 @@ package io.github.mateussilvadev.horizondesk.model.domain;
 import io.github.mateussilvadev.horizondesk.exception.BusinessException;
 import io.github.mateussilvadev.horizondesk.exception.Code;
 import io.github.mateussilvadev.horizondesk.model.enums.PriorityTicket;
+import io.github.mateussilvadev.horizondesk.model.enums.Role;
 import io.github.mateussilvadev.horizondesk.model.enums.StatusTicket;
 import io.github.mateussilvadev.horizondesk.validation.CommonValidation;
 import jakarta.persistence.*;
@@ -55,7 +56,7 @@ public class Ticket implements Serializable {
     private StatusTicket status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "requester_id", nullable = false)
     private User requester;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -63,8 +64,8 @@ public class Ticket implements Serializable {
     private Department department;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "technician_id")
-    private User technician;
+    @JoinColumn(name = "assigned_technician_id")
+    private User assignedTechnician;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
@@ -111,6 +112,39 @@ public class Ticket implements Serializable {
         if (this.priority.equals(newPriority)) return;
         this.priority = CommonValidation.required(newPriority, "ticket.field.priority");
         this.priorityWeight = newPriority.getWeight();
+    }
+
+    public void assignTechnician(User assignTechnician) {
+        if (this.status != StatusTicket.OPEN && this.status != StatusTicket.IN_PROGRESS)
+            throw new BusinessException(Code.TICKET_ALREADY_CLOSED, "ticket.error.ticket_already_closed");
+
+        User technician = CommonValidation.required(assignTechnician, "ticket.field.technician");
+
+        if (technician.getRole() != Role.ROLE_TECHNICIAN)
+            throw new BusinessException(Code.INVALID_ASSIGNMENT, "ticket.error.invalid_technician");
+
+        if(this.requester.getUuid().equals(technician.getUuid()))
+            throw new BusinessException(Code.INVALID_ASSIGNMENT, "ticket.error.technician_cannot_be_requester");
+
+        this.assignedTechnician = technician;
+
+        if (StatusTicket.OPEN.equals(this.status))
+            changeStatus(StatusTicket.IN_PROGRESS);
+    }
+
+    public void resolve() {
+        this.status.transitionTo(StatusTicket.RESOLVED);
+        this.status = StatusTicket.RESOLVED;
+    }
+
+    public void close() {
+        this.status.transitionTo(StatusTicket.CLOSED);
+        this.status = StatusTicket.CLOSED;
+    }
+
+    private void changeStatus(StatusTicket newStatus) {
+        this.status.transitionTo(newStatus);
+        this.status = newStatus;
     }
 
     private static String checkDescription(String description) {

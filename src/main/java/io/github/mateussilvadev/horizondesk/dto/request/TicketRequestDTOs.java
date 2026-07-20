@@ -32,4 +32,8 @@ public final class TicketRequestDTOs {
     public record TicketChangePriority(
             @NotNull(message = "Priority Ticket is required.")
             PriorityTicket priorityTicket) { }
+
+    public record TicketAssignTechnician(
+            @NotNull(message = "UUID of technician is required.")
+            UUID technicianUuid) { }
 }

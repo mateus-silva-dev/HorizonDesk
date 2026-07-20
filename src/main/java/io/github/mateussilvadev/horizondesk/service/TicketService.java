@@ -1,6 +1,8 @@
 package io.github.mateussilvadev.horizondesk.service;
 
 import io.github.mateussilvadev.horizondesk.dto.request.TicketRequestDTOs;
+import io.github.mateussilvadev.horizondesk.exception.BusinessException;
+import io.github.mateussilvadev.horizondesk.exception.Code;
 import io.github.mateussilvadev.horizondesk.exception.EntityNotFoundException;
 import io.github.mateussilvadev.horizondesk.mapper.TicketMapper;
 import io.github.mateussilvadev.horizondesk.model.domain.Ticket;
@@ -52,6 +54,26 @@ public class TicketService {
     public void changePriority(UUID uuid, PriorityTicket newPriority) {
         Ticket ticket = findByUuid(uuid);
         ticket.changePriority(newPriority);
+    }
+
+    @Transactional
+    public void assignTechnician(UUID ticketUuid, UUID technicianUuid) {
+        Ticket ticket = findByUuid(ticketUuid);
+        User technician = userRepository.findByUuid(technicianUuid)
+                .orElseThrow(() -> new EntityNotFoundException("ticket_service.error.technician_not_found"));
+        ticket.assignTechnician(technician);
+    }
+
+    @Transactional
+    public void resolveTicket(UUID uuid) {
+        Ticket ticket = findByUuid(uuid);
+        ticket.resolve();
+    }
+
+    @Transactional
+    public void closeTicket(UUID uuid) {
+        Ticket ticket = findByUuid(uuid);
+        ticket.close();
     }
 
 }
