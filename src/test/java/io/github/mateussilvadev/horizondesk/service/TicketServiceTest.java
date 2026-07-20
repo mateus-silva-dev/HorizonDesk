@@ -3,12 +3,16 @@ package io.github.mateussilvadev.horizondesk.service;
 import io.github.mateussilvadev.horizondesk.builder.TicketBuilder;
 import io.github.mateussilvadev.horizondesk.builder.UserBuilder;
 import io.github.mateussilvadev.horizondesk.dto.request.TicketRequestDTOs;
+import io.github.mateussilvadev.horizondesk.exception.BusinessException;
 import io.github.mateussilvadev.horizondesk.exception.EntityNotFoundException;
 import io.github.mateussilvadev.horizondesk.model.domain.Ticket;
 import io.github.mateussilvadev.horizondesk.model.domain.User;
 import io.github.mateussilvadev.horizondesk.model.enums.PriorityTicket;
+import io.github.mateussilvadev.horizondesk.model.enums.Role;
+import io.github.mateussilvadev.horizondesk.model.enums.StatusTicket;
 import io.github.mateussilvadev.horizondesk.repository.TicketRepository;
 import io.github.mateussilvadev.horizondesk.repository.UserRepository;
+import io.github.mateussilvadev.horizondesk.support.DomainAssertions;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,11 +35,11 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @DisplayName("Ticket service test")
 @ExtendWith(MockitoExtension.class)
-public class TicketServiceTest {
+public class TicketServiceTest implements DomainAssertions {
 
     private static final Faker faker = new Faker(Locale.of("pt", "BR"));
 
@@ -69,7 +73,7 @@ public class TicketServiceTest {
     }
 
     private User mockUserFound(UUID uuid) {
-        var user = UserBuilder.anUser().withUuid(uuid).build();
+        var user = UserBuilder.anUser().withUuid(uuid).withRole(Role.ROLE_TECHNICIAN).build();
         given(userRepository.findByUuid(uuid)).willReturn(Optional.of(user));
         return user;
     }
@@ -170,6 +174,59 @@ public class TicketServiceTest {
             Ticket ticket = mockTicketFound(uuid);
             service.changePriority(uuid, PriorityTicket.valueOf(priority));
             assertThat(ticket.getPriority()).isEqualTo(PriorityTicket.valueOf(priority));
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Tests the assignment of a technician to a ticket")
+    class AssignTechnician {
+
+        @Test
+        @DisplayName("You must assign a technician to a ticket.")
+        void shouldAssignTechnician() {
+            Ticket ticket = mockTicketFound(uuid);
+            User technician = mockUserFound(userUuid);
+            service.assignTechnician(uuid, userUuid);
+            assertThat(ticket.getAssignedTechnician()).isEqualTo(technician);
+        }
+
+        @Test
+        @DisplayName("An exception should be thrown when the technician is not found")
+        void shouldThrowExceptionWhenTechnicianNotFound() {
+            UUID random = UUID.randomUUID();
+            Ticket ticket = mockTicketFound(uuid);
+            given(userRepository.findByUuid(random)).willReturn(Optional.empty());
+
+            assertThatException(
+                    () -> service.assignTechnician(uuid, random),
+                    EntityNotFoundException.class, "ticket_service.error.technician_not_found");
+
+            verify(repository, never()).save(any());
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Tests the resolution of a ticket")
+    class ChangeStatusTicket {
+
+        @Test
+        @DisplayName("Resolve should update status and save ticket")
+        void shouldResolveTicketAndSave() {
+            Ticket ticket = TicketBuilder.anTicket().withStatus(StatusTicket.IN_PROGRESS).build();
+            given(repository.findByUuid(uuid)).willReturn(Optional.of(ticket));
+            service.resolveTicket(uuid);
+            assertThat(ticket.getStatus()).isEqualTo(StatusTicket.RESOLVED);
+        }
+
+        @Test
+        @DisplayName("Close should update status and save ticket")
+        void shouldCloseTicketAndSave() {
+            Ticket ticket = TicketBuilder.anTicket().withStatus(StatusTicket.RESOLVED).build();
+            given(repository.findByUuid(uuid)).willReturn(Optional.of(ticket));
+            service.closeTicket(uuid);
+            assertThat(ticket.getStatus()).isEqualTo(StatusTicket.CLOSED);
         }
 
     }

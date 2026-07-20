@@ -17,6 +17,8 @@ import net.datafaker.Faker;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.MessageSource;
@@ -170,6 +172,25 @@ public class TicketControllerTest {
         mockMvc.perform(patch(BASE_URL + "/{uuid}/priority", uuid)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Must assign a technician to a ticket. and return 204")
+    void shouldAssignTechnicianTheTicket() throws Exception {
+        var dto = new TicketRequestDTOs.TicketAssignTechnician(UUID.randomUUID());
+
+        mockMvc.perform(patch(BASE_URL + "/{uuid}/assign", uuid)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNoContent());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"resolve", "close"})
+    @DisplayName("Should return 204 when changing ticket status")
+    void shouldReturn204WhenChangingStatus(String action) throws Exception {
+        mockMvc.perform(patch(BASE_URL + "/{uuid}/" + action, uuid))
                 .andExpect(status().isNoContent());
     }
 
