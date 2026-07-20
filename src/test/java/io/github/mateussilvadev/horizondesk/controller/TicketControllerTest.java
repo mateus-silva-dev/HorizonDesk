@@ -3,15 +3,14 @@ package io.github.mateussilvadev.horizondesk.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.mateussilvadev.horizondesk.builder.TicketBuilder;
 import io.github.mateussilvadev.horizondesk.builder.UserBuilder;
+import io.github.mateussilvadev.horizondesk.dto.request.TicketFilter;
 import io.github.mateussilvadev.horizondesk.dto.request.TicketRequestDTOs;
-import io.github.mateussilvadev.horizondesk.dto.request.UserRequestDTOs;
 import io.github.mateussilvadev.horizondesk.exception.BusinessException;
 import io.github.mateussilvadev.horizondesk.exception.Code;
 import io.github.mateussilvadev.horizondesk.exception.EntityNotFoundException;
 import io.github.mateussilvadev.horizondesk.model.domain.Ticket;
 import io.github.mateussilvadev.horizondesk.model.domain.User;
 import io.github.mateussilvadev.horizondesk.model.enums.PriorityTicket;
-import io.github.mateussilvadev.horizondesk.model.enums.Role;
 import io.github.mateussilvadev.horizondesk.service.TicketService;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.DisplayName;
@@ -22,11 +21,13 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -34,7 +35,7 @@ import static io.github.mateussilvadev.horizondesk.model.enums.PriorityTicket.HI
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -192,6 +193,31 @@ public class TicketControllerTest {
     void shouldReturn204WhenChangingStatus(String action) throws Exception {
         mockMvc.perform(patch(BASE_URL + "/{uuid}/" + action, uuid))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("GET /api/v1/tickets should return 200 OK and paginated response")
+    void getTicketsShouldReturnPaginatedResponse() throws Exception {
+        Pageable pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.ASC, "priority", "createdAt"));
+        List<Ticket> tickets = List.of(TicketBuilder.anTicket().build());
+        Page<Ticket> pageMock = new PageImpl<>(tickets, pageable, tickets.size());
+
+        given(service.findAllPaginated(any(TicketFilter.class), any(Pageable.class))).willReturn(pageMock);
+
+        mockMvc.perform(get("/api/v1/tickets")
+                        .param("status", "OPEN")
+                        .param("priority", "HIGH")
+                        .param("page", "0")
+                        .param("size", "20")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.page").value(0))
+                .andExpect(jsonPath("$.size").value(20))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.last").value(true));
+
+        verify(service, times(1)).findAllPaginated(any(TicketFilter.class), any(Pageable.class));
     }
 
     private void assertTicketResponse(ResultActions actions, Ticket ticket) throws Exception {

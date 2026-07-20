@@ -2,6 +2,7 @@ package io.github.mateussilvadev.horizondesk.service;
 
 import io.github.mateussilvadev.horizondesk.builder.TicketBuilder;
 import io.github.mateussilvadev.horizondesk.builder.UserBuilder;
+import io.github.mateussilvadev.horizondesk.dto.request.TicketFilter;
 import io.github.mateussilvadev.horizondesk.dto.request.TicketRequestDTOs;
 import io.github.mateussilvadev.horizondesk.exception.BusinessException;
 import io.github.mateussilvadev.horizondesk.exception.EntityNotFoundException;
@@ -24,8 +25,14 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
@@ -227,6 +234,31 @@ public class TicketServiceTest implements DomainAssertions {
             given(repository.findByUuid(uuid)).willReturn(Optional.of(ticket));
             service.closeTicket(uuid);
             assertThat(ticket.getStatus()).isEqualTo(StatusTicket.CLOSED);
+        }
+
+    }
+
+    @Nested
+    @DisplayName("Tests the search of a ticket")
+    class Search {
+
+        @Test
+        @DisplayName("Should return paginated tickets when filters are applied")
+        void shouldReturnPaginatedTicketsWhenFiltersAreApplied() {
+            TicketFilter filter = new TicketFilter(StatusTicket.OPEN, PriorityTicket.HIGH, null, null, null);
+            Pageable pageable = PageRequest.of(0, 20);
+
+            List<Ticket> tickets = List.of(TicketBuilder.anTicket().build());
+            Page<Ticket> pageMock = new PageImpl<>(tickets, pageable, tickets.size());
+
+            given(repository.findAll(any(Specification.class), eq(pageable))).willReturn(pageMock);
+
+            Page<Ticket> result = service.findAllPaginated(filter, pageable);
+
+            assertThat(result).isNotNull();
+            assertThat(result.getContent()).hasSize(1);
+
+            verify(repository, times(1)).findAll(any(Specification.class), eq(pageable));
         }
 
     }
