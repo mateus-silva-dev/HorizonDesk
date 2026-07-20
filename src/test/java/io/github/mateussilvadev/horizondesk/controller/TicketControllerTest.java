@@ -11,6 +11,7 @@ import io.github.mateussilvadev.horizondesk.exception.EntityNotFoundException;
 import io.github.mateussilvadev.horizondesk.model.domain.Ticket;
 import io.github.mateussilvadev.horizondesk.model.domain.User;
 import io.github.mateussilvadev.horizondesk.model.enums.PriorityTicket;
+import io.github.mateussilvadev.horizondesk.model.enums.Role;
 import io.github.mateussilvadev.horizondesk.service.TicketService;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +28,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.Locale;
 import java.util.UUID;
 
+import static io.github.mateussilvadev.horizondesk.model.enums.PriorityTicket.HIGH;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -158,6 +160,17 @@ public class TicketControllerTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description").value(ticket.getDescription()));
+    }
+
+    @Test
+    @DisplayName("Should change user role and return 204")
+    void shouldChangePriority() throws Exception {
+        var dto = new TicketRequestDTOs.TicketChangePriority(HIGH);
+
+        mockMvc.perform(patch(BASE_URL + "/{uuid}/priority", uuid)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isNoContent());
     }
 
     private void assertTicketResponse(ResultActions actions, Ticket ticket) throws Exception {

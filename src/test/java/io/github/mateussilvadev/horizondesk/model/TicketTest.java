@@ -3,6 +3,7 @@ package io.github.mateussilvadev.horizondesk.model;
 import io.github.mateussilvadev.horizondesk.builder.TicketBuilder;
 import io.github.mateussilvadev.horizondesk.exception.BusinessException;
 import io.github.mateussilvadev.horizondesk.model.domain.Ticket;
+import io.github.mateussilvadev.horizondesk.model.enums.PriorityTicket;
 import io.github.mateussilvadev.horizondesk.model.enums.StatusTicket;
 import io.github.mateussilvadev.horizondesk.support.DomainAssertions;
 import net.datafaker.Faker;
@@ -10,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Locale;
 import java.util.Map;
@@ -88,4 +91,38 @@ public class TicketTest implements DomainAssertions {
             );
         }
     }
+
+    @Nested
+    @DisplayName("Change priority for ticket")
+    class ChangePriority {
+
+        @ParameterizedTest(name = "Priority: {0}")
+        @ValueSource(strings = {"LOW", "MEDIUM", "HIGH", "CRITICAL"})
+        @DisplayName("Should change priority successfully")
+        void shouldChangePriority(String priority) {
+            PriorityTicket priorityTicket = PriorityTicket.valueOf(priority);
+            assertUpdateWorkflow(ticket::changePriority, ticket::getPriority, priorityTicket, priorityTicket);
+        }
+
+        @Test
+        @DisplayName("Should ignore department update when entity is identical to current")
+        void shouldIgnoreUpdateWhenDepartmentIsTheSame() {
+            assertNoChange(() -> ticket.changePriority(ticket.getPriority()), ticket::getPriority);
+        }
+
+        @ParameterizedTest(name = "Priority: {0}")
+        @ValueSource(strings = {"LOW", "MEDIUM", "HIGH", "CRITICAL"})
+        @DisplayName("It should throw an exception when attempting to change priority a ticket with a status other than open")
+        void shouldThrowExceptionWhenTicketNotIsOpen(String priority) {
+            Ticket ticket1 = TicketBuilder.anTicket().withStatus(StatusTicket.IN_PROGRESS).build();
+            PriorityTicket priorityTicket = PriorityTicket.valueOf(priority);
+            assertThatException(
+                    () -> ticket1.changePriority(priorityTicket),
+                    BusinessException.class, "ticket.error.ticket_already_closed"
+            );
+        }
+
+    }
+
+
 }

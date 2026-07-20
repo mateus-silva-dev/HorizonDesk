@@ -15,6 +15,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -112,7 +114,7 @@ public class TicketServiceTest {
     }
 
     @Nested
-    @DisplayName("Search test for ticket")
+    @DisplayName("Test to search the ticket")
     class Find {
         @Test
         @DisplayName("Search by UUID")
@@ -143,7 +145,7 @@ public class TicketServiceTest {
     }
 
     @Nested
-    @DisplayName("Update test for ticket")
+    @DisplayName("Test to update the ticket")
     class Update {
         @Test
         void shouldUpdateTicket() {
@@ -156,5 +158,19 @@ public class TicketServiceTest {
             assertThat(answer.getUuid()).isEqualTo(ticket.getUuid());
             assertThat(answer.getDescription()).isEqualTo(ticketUpdateDTO.description());
         }
+    }
+
+    @Nested
+    @DisplayName("Test to change the ticket priority")
+    class ChangePriority {
+
+        @ParameterizedTest(name = "Priority: {0}")
+        @ValueSource(strings = {"LOW", "MEDIUM", "HIGH", "CRITICAL"})
+        void shouldChangePriority(String priority) {
+            Ticket ticket = mockTicketFound(uuid);
+            service.changePriority(uuid, PriorityTicket.valueOf(priority));
+            assertThat(ticket.getPriority()).isEqualTo(PriorityTicket.valueOf(priority));
+        }
+
     }
 }
