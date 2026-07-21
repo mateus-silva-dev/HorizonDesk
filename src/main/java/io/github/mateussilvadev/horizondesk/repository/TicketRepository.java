@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, UUID>, JpaSpecificationExecutor<Ticket> {
     Optional<Ticket> findByUuid(UUID uuid);
+    boolean existsByUuid(UUID ticketUuid);
 }

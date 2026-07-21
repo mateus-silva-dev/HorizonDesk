@@ -11,6 +11,7 @@ import io.github.mateussilvadev.horizondesk.model.domain.User;
 import io.github.mateussilvadev.horizondesk.model.enums.PriorityTicket;
 import io.github.mateussilvadev.horizondesk.model.enums.Role;
 import io.github.mateussilvadev.horizondesk.model.enums.StatusTicket;
+import io.github.mateussilvadev.horizondesk.repository.TicketHistoryRepository;
 import io.github.mateussilvadev.horizondesk.repository.TicketRepository;
 import io.github.mateussilvadev.horizondesk.repository.UserRepository;
 import io.github.mateussilvadev.horizondesk.support.DomainAssertions;
@@ -54,6 +55,9 @@ public class TicketServiceTest implements DomainAssertions {
     private TicketRepository repository;
 
     @Mock
+    private TicketHistoryRepository historyRepository;
+
+    @Mock
     private UserRepository userRepository;
 
     private TicketService service;
@@ -70,7 +74,7 @@ public class TicketServiceTest implements DomainAssertions {
                 PriorityTicket.LOW, userUuid
         );
 
-        service = new TicketService(repository, userRepository);
+        service = new TicketService(repository, userRepository, historyRepository);
     }
 
     private Ticket mockTicketFound(UUID uuid) {

@@ -7,9 +7,13 @@ import io.github.docflowlib.docflow.annotations.ApiDocPost;
 import io.github.mateussilvadev.horizondesk.dto.request.TicketFilter;
 import io.github.mateussilvadev.horizondesk.dto.request.TicketRequestDTOs;
 import io.github.mateussilvadev.horizondesk.dto.response.PageResponse;
+import io.github.mateussilvadev.horizondesk.dto.response.TicketHistoryResponse;
 import io.github.mateussilvadev.horizondesk.dto.response.TicketResponseDTOs;
+import io.github.mateussilvadev.horizondesk.mapper.TicketHistoryMapper;
 import io.github.mateussilvadev.horizondesk.mapper.TicketMapper;
 import io.github.mateussilvadev.horizondesk.model.domain.Ticket;
+import io.github.mateussilvadev.horizondesk.model.domain.TicketHistory;
+import io.github.mateussilvadev.horizondesk.service.TicketHistoryService;
 import io.github.mateussilvadev.horizondesk.service.TicketService;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
@@ -22,6 +26,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 @RestController
@@ -30,9 +36,13 @@ import java.util.UUID;
 public class TicketController {
 
     private final TicketService service;
+    private final TicketHistoryService historyService;
+    private final TicketHistoryMapper mapper;
 
-    public TicketController(TicketService service) {
+    public TicketController(TicketService service, TicketHistoryService historyService, TicketHistoryMapper mapper) {
         this.service = service;
+        this.historyService = historyService;
+        this.mapper = mapper;
     }
 
     @PostMapping
@@ -106,5 +116,11 @@ public class TicketController {
 
         Page<Ticket> page = service.findAllPaginated(filter, pageable);
         return ResponseEntity.ok(TicketMapper.toTicketResponse(page));
+    }
+
+    @GetMapping("/{uuid}/history")
+    public ResponseEntity<List<TicketHistoryResponse>> findHistory(@PathVariable UUID uuid) {
+        List<TicketHistory> histories = historyService.findByTicketUuid(uuid);
+        return ResponseEntity.ok(mapper.toResponseList(histories));
     }
 }
