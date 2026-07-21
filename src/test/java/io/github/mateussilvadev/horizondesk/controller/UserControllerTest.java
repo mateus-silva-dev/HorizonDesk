@@ -122,7 +122,7 @@ public class UserControllerTest {
         @DisplayName("Should create user and return 201")
         void shouldCreateUser() throws Exception {
             var request = new UserRequestDTOs.UserCreate(
-                    FAKER.name().fullName(),
+                    FAKER.name().fullName().replace(".", ""),
                     FAKER.internet().emailAddress(),
                     FAKER.credentials().password(8, 20),
                     UUID.fromString("b85a4dd5-0866-40d2-9688-c5ba16ce9b5e"));
