@@ -228,6 +228,15 @@ public class TicketServiceTest implements DomainAssertions {
         }
 
         @Test
+        @DisplayName("Reopen should update status and save ticket")
+        void shouldReopenTicketAndSave() {
+            Ticket ticket = TicketBuilder.anTicket().withStatus(StatusTicket.RESOLVED).build();
+            given(repository.findByUuid(uuid)).willReturn(Optional.of(ticket));
+            service.reopenTicket(uuid);
+            assertThat(ticket.getStatus()).isEqualTo(StatusTicket.IN_PROGRESS);
+        }
+
+        @Test
         @DisplayName("Close should update status and save ticket")
         void shouldCloseTicketAndSave() {
             Ticket ticket = TicketBuilder.anTicket().withStatus(StatusTicket.RESOLVED).build();

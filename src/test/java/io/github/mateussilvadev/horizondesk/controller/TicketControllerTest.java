@@ -188,7 +188,7 @@ public class TicketControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"resolve", "close"})
+    @ValueSource(strings = {"resolve", "reopen", "close"})
     @DisplayName("Should return 204 when changing ticket status")
     void shouldReturn204WhenChangingStatus(String action) throws Exception {
         mockMvc.perform(patch(BASE_URL + "/{uuid}/" + action, uuid))

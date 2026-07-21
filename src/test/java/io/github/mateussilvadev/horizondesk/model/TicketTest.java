@@ -240,8 +240,16 @@ public class TicketTest implements DomainAssertions {
         }
 
         @Test
-        @DisplayName("Should update status to RESOLVED when resolve is called from IN_PROGRESS")
-        void shouldUpdateStatusToCloded() {
+        @DisplayName("Should update status to IN_PROGRESS when resolve is called from RESOLVED")
+        void shouldUpdateStatusToInProgress() {
+            Ticket ticket = TicketBuilder.anTicket().withStatus(StatusTicket.RESOLVED).build();
+            ticket.reopen();
+            assertThat(ticket.getStatus()).isEqualTo(StatusTicket.IN_PROGRESS);
+        }
+
+        @Test
+        @DisplayName("Should update status to CLOSED when resolve is called from IN_PROGRESS")
+        void shouldUpdateStatusToClosed() {
             Ticket ticket = TicketBuilder.anTicket().withStatus(StatusTicket.RESOLVED).build();
             ticket.close();
             assertThat(ticket.getStatus()).isEqualTo(StatusTicket.CLOSED);
