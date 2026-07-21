@@ -14,7 +14,7 @@ public class UserMapper {
 
     private static final ModelMapper MAPPER = new ModelMapper();
     static {
-        MAPPER.createTypeMap(User.class, UserResponseDTOs.Response.class)
+        MAPPER.createTypeMap(User.class, UserResponseDTOs.UserResponse.class)
                 .setConverter(context -> {
                     User source = context.getSource();
                     if (source == null) return null;
@@ -23,7 +23,7 @@ public class UserMapper {
                             ? source.getDepartment().getName()
                             : null;
 
-                    return new UserResponseDTOs.Response(
+                    return new UserResponseDTOs.UserResponse(
                             source.getUuid(),
                             source.getName(),
                             source.getEmail().toLowerCase(Locale.ROOT),
@@ -36,7 +36,7 @@ public class UserMapper {
 
     private UserMapper() { }
 
-    public static User toUser(UserRequestDTOs.Create dto, Department department, String encryptedPassword) {
+    public static User toUser(UserRequestDTOs.UserCreate dto, Department department, String encryptedPassword) {
         return User.create(
                 dto.name(),
                 dto.email(),
@@ -45,9 +45,9 @@ public class UserMapper {
         );
     }
 
-    public static UserResponseDTOs.Response toResponse(User user) {
+    public static UserResponseDTOs.UserResponse toResponse(User user) {
         if (user == null) return null;
-        return MAPPER.map(user, UserResponseDTOs.Response.class);
+        return MAPPER.map(user, UserResponseDTOs.UserResponse.class);
     }
 
     public static UserResponseDTOs.TechnicianOption toTechnicianOption(User user) {

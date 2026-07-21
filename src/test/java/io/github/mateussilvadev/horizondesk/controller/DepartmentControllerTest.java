@@ -2,14 +2,11 @@ package io.github.mateussilvadev.horizondesk.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.mateussilvadev.horizondesk.builder.DepartmentBuilder;
-import io.github.mateussilvadev.horizondesk.builder.UserBuilder;
 import io.github.mateussilvadev.horizondesk.dto.request.DepartmentRequestDTOs;
-import io.github.mateussilvadev.horizondesk.dto.request.UserRequestDTOs;
 import io.github.mateussilvadev.horizondesk.exception.BusinessException;
 import io.github.mateussilvadev.horizondesk.exception.Code;
 import io.github.mateussilvadev.horizondesk.exception.EntityNotFoundException;
 import io.github.mateussilvadev.horizondesk.model.domain.Department;
-import io.github.mateussilvadev.horizondesk.model.domain.User;
 import io.github.mateussilvadev.horizondesk.service.DepartmentService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +30,6 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.description;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -75,9 +70,9 @@ public class DepartmentControllerTest {
     @Test
     @DisplayName("Should return 400 for general business rules")
     void shouldReturn400ForGeneralBusinessException() throws Exception {
-        var request = new DepartmentRequestDTOs.Create("Compliance");
+        var request = new DepartmentRequestDTOs.DepartmentCreate("Compliance");
 
-        given(service.create(any(DepartmentRequestDTOs.Create.class))).willThrow(
+        given(service.create(any(DepartmentRequestDTOs.DepartmentCreate.class))).willThrow(
                 new BusinessException(Code.MALFORMED_JSON, "error.invalid_json"));
 
         mockMvc.perform(post(BASE_URL)
@@ -90,7 +85,7 @@ public class DepartmentControllerTest {
     @Test
     @DisplayName("Should return 422 when any name is invalid.")
     void shouldReturn422WhenAnyNameIsInvalid() throws Exception {
-        var request = new DepartmentRequestDTOs.Create("A");
+        var request = new DepartmentRequestDTOs.DepartmentCreate("A");
 
         mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -115,11 +110,11 @@ public class DepartmentControllerTest {
 
     @Nested
     @DisplayName("Create department")
-    class Create {
+    class DepartmentCreate {
         @Test
         @DisplayName("Should create department and return 201")
         void shouldCreateUser() throws Exception {
-            var request = new DepartmentRequestDTOs.Create("Compliance");
+            var request = new DepartmentRequestDTOs.DepartmentCreate("Compliance");
 
             var department = DepartmentBuilder.anDepartment()
                     .withName(request.name())
@@ -140,7 +135,7 @@ public class DepartmentControllerTest {
         @Test
         @DisplayName("Should return 409 when name already registered")
         void shouldReturn409WhenNameExists() throws Exception {
-            var request = new DepartmentRequestDTOs.Create("Compliance");
+            var request = new DepartmentRequestDTOs.DepartmentCreate("Compliance");
 
             String dbMockedMessage = "ERROR: duplicate key value violates unique constraint \"ukj6cwks7xecs5jov19ro8ge3qk\"";
 
@@ -169,7 +164,7 @@ public class DepartmentControllerTest {
     @Test
     @DisplayName("Should update department and return 200")
     void shouldUpdateDepartment() throws Exception {
-        var dto = new DepartmentRequestDTOs.Update("New Name");
+        var dto = new DepartmentRequestDTOs.DepartmentUpdate("New Name");
         var department = DepartmentBuilder.anDepartment().withName("New Name").build();
 
         given(service.update(eq(uuid), any())).willReturn(department);

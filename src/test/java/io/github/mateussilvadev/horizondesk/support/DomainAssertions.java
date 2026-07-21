@@ -17,7 +17,7 @@ public interface DomainAssertions {
         assertThatThrownBy(action).isInstanceOf((Class<?>) exception).hasMessage(expectedMessage);
     }
 
-    default <T> void assertUpdateWorkflow(Consumer<T> updateMethod, Supplier<T> getterMethod, T newValue, T expectedValue) {
+    default <T, O> void assertUpdateWorkflow(Consumer<T> updateMethod, Supplier<O> getterMethod, T newValue, O expectedValue) {
         assertIdempotent(() -> updateMethod.accept(newValue), getterMethod);
         assertEquals(expectedValue, getterMethod.get());
     }

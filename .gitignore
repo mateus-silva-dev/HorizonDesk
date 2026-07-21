@@ -157,6 +157,10 @@ buildNumber.properties
 .env.prod
 .env.local
 
+# Carga inicial de testes local (Ignorado para o GitHub)
+src/main/java/io/github/mateussilvadev/horizondesk/config/DatabaseSeeder.java
+
+
 logs/
 *.log.*
 

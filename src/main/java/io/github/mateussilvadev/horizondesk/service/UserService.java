@@ -41,7 +41,7 @@ public class UserService {
      * Métodos de negócios.
      */
     @Transactional
-    public User create(UserRequestDTOs.Create dto) {
+    public User create(UserRequestDTOs.UserCreate dto) {
         checkEmailExists(dto.email());
         Department department = departmentRepository.findByUuid(dto.departmentUuid())
             .orElseThrow(() -> new EntityNotFoundException("user_service.error.department_not_found"));
@@ -57,7 +57,7 @@ public class UserService {
     }
 
     @Transactional
-    public User updateUser(UUID uuid, UserRequestDTOs.Update dto) {
+    public User updateUser(UUID uuid, UserRequestDTOs.UserUpdate dto) {
         User user = findByUuid(uuid);
         if (dto.name() != null)
             user.changeName(dto.name());

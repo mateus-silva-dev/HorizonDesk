@@ -8,7 +8,6 @@ import io.github.mateussilvadev.horizondesk.exception.EntityNotFoundException;
 import io.github.mateussilvadev.horizondesk.model.domain.Department;
 import io.github.mateussilvadev.horizondesk.model.domain.User;
 import io.github.mateussilvadev.horizondesk.model.enums.Role;
-import io.github.mateussilvadev.horizondesk.service.DepartmentService;
 import io.github.mateussilvadev.horizondesk.service.UserService;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.DisplayName;
@@ -78,9 +77,9 @@ public class UserControllerTest {
     @Test
     @DisplayName("Should return 400 for general business rules")
     void shouldReturn400ForGeneralBusinessException() throws Exception {
-        var request = new UserRequestDTOs.Create("John Doe", "john@email.com", "password123", UUID.randomUUID());
+        var request = new UserRequestDTOs.UserCreate("John Doe", "john@email.com", "password123", UUID.randomUUID());
 
-        given(userService.create(any(UserRequestDTOs.Create.class))).willThrow(
+        given(userService.create(any(UserRequestDTOs.UserCreate.class))).willThrow(
                 new BusinessException(Code.MALFORMED_JSON, "error.invalid_json"));
 
         mockMvc.perform(post(BASE_URL)
@@ -93,7 +92,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("Should return 422 when any data is invalid.")
     void shouldReturn422WhenAnyDataIsInvalid() throws Exception {
-        var request = new UserRequestDTOs.Create("John Doe", "email-invalid", "password123", UUID.randomUUID());
+        var request = new UserRequestDTOs.UserCreate("John Doe", "email-invalid", "password123", UUID.randomUUID());
 
         mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -118,11 +117,11 @@ public class UserControllerTest {
 
     @Nested
     @DisplayName("Create user")
-    class Create {
+    class UserCreate {
         @Test
         @DisplayName("Should create user and return 201")
         void shouldCreateUser() throws Exception {
-            var request = new UserRequestDTOs.Create(
+            var request = new UserRequestDTOs.UserCreate(
                     FAKER.name().fullName(),
                     FAKER.internet().emailAddress(),
                     FAKER.credentials().password(8, 20),
@@ -148,11 +147,13 @@ public class UserControllerTest {
         @Test
         @DisplayName("Should return 409 when email already registered")
         void shouldReturn409WhenEmailExists() throws Exception {
-            var request = new UserRequestDTOs.Create(FAKER.name().fullName(), "email@test.com",
+            var request = new UserRequestDTOs.UserCreate(FAKER.name().fullName(), "email@test.com",
                     FAKER.credentials().password(8, 20), UUID.fromString("b85a4dd5-0866-40d2-9688-c5ba16ce9b5e"));
 
+            String dbMockedMessage = "ERROR: duplicate key value violates unique constraint \"uk6dotkott2kjsp8vw4d0m25fb7\"";
+
             given(userService.create(any()))
-                    .willThrow(new DataIntegrityViolationException("user_service.error.email_already_registered"));
+                    .willThrow(new DataIntegrityViolationException(dbMockedMessage));
 
             mockMvc.perform(post(BASE_URL)
                             .contentType(MediaType.APPLICATION_JSON)
@@ -176,7 +177,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("Should update user and return 200")
     void shouldUpdateUser() throws Exception {
-        var dto = new UserRequestDTOs.Update("New Name", null);
+        var dto = new UserRequestDTOs.UserUpdate("New Name", null);
         var user = UserBuilder.anUser().withName("New Name").build();
 
         given(userService.updateUser(eq(uuid), any())).willReturn(user);

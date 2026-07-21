@@ -16,12 +16,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +40,7 @@ public class UserTest implements DomainAssertions {
 
     @Nested
     @DisplayName("User creation tests")
-    class Create {
+    class UserCreate {
         @Test
         @DisplayName("Should validate initial entity state match builder inputs")
         void shouldCreateUserWithValidState() {

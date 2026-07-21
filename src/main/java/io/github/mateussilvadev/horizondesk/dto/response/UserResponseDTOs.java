@@ -8,7 +8,7 @@ public final class UserResponseDTOs {
 
     private UserResponseDTOs() { }
 
-    public record Response(
+    public record UserResponse(
             UUID uuid,
             String name,
             String email,

@@ -1,17 +1,12 @@
 package io.github.mateussilvadev.horizondesk.service;
 
 import io.github.mateussilvadev.horizondesk.builder.DepartmentBuilder;
-import io.github.mateussilvadev.horizondesk.builder.UserBuilder;
 import io.github.mateussilvadev.horizondesk.dto.request.DepartmentRequestDTOs;
 import io.github.mateussilvadev.horizondesk.exception.BusinessException;
 import io.github.mateussilvadev.horizondesk.exception.EntityNotFoundException;
 import io.github.mateussilvadev.horizondesk.model.domain.Department;
-import io.github.mateussilvadev.horizondesk.model.domain.User;
-import io.github.mateussilvadev.horizondesk.model.enums.Role;
-import io.github.mateussilvadev.horizondesk.model.enums.StatusUser;
 import io.github.mateussilvadev.horizondesk.repository.DepartmentRepository;
 import io.github.mateussilvadev.horizondesk.support.DomainAssertions;
-import org.awaitility.core.DeadlockException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -45,12 +40,12 @@ public class DepartmentServiceTest implements DomainAssertions {
 
     @InjectMocks
     private DepartmentService service;
-    private DepartmentRequestDTOs.Create createDTO;
+    private DepartmentRequestDTOs.DepartmentCreate departmentCreateDTO;
     private final UUID uuid = UUID.randomUUID();
 
     @BeforeEach
     void setUp() {
-        createDTO = new DepartmentRequestDTOs.Create("Technical Support");
+        departmentCreateDTO = new DepartmentRequestDTOs.DepartmentCreate("Technical Support");
         service = new DepartmentService(repository);
     }
 
@@ -62,20 +57,20 @@ public class DepartmentServiceTest implements DomainAssertions {
 
     @Nested
     @DisplayName("Department creation test")
-    class Create {
+    class DepartmentCreate {
 
         @Test
         @DisplayName("Create should save department")
         void shouldSaveDepartment() {
-            given(repository.existsByName(createDTO.name())).willReturn(false);
+            given(repository.existsByName(departmentCreateDTO.name())).willReturn(false);
             given(repository.save(any())).willAnswer(i -> i.getArgument(0));
 
-            var answer = service.create(createDTO);
+            var answer = service.create(departmentCreateDTO);
 
             assertThat(answer).isNotNull();
             assertThat(answer)
                     .extracting("name")
-                    .isEqualTo(createDTO.name());
+                    .isEqualTo(departmentCreateDTO.name());
 
             verify(repository).save(answer);
         }
@@ -83,32 +78,32 @@ public class DepartmentServiceTest implements DomainAssertions {
         @Test
         @DisplayName("An exception should be thrown when the department name is already registered")
         void shouldThrowExceptionWhenNameAlreadyExists() {
-            given(repository.existsByName(createDTO.name())).willReturn(true);
+            given(repository.existsByName(departmentCreateDTO.name())).willReturn(true);
 
-            BusinessException ex = assertThrows(BusinessException.class, () -> service.create(createDTO));
+            BusinessException ex = assertThrows(BusinessException.class, () -> service.create(departmentCreateDTO));
 
             assertThat(ex.getCode()).isEqualTo(DEPARTMENT_ALREADY_REGISTERED);
             assertThat(ex.getMessage()).isEqualTo("department_service.error.department_already_registered");
 
-            verify(repository).existsByName(createDTO.name());
+            verify(repository).existsByName(departmentCreateDTO.name());
             verify(repository, never()).save(any());
         }
     }
 
     @Nested
     @DisplayName("Department must update successfully")
-    class Update {
+    class DepartmentUpdate {
         @Test
         @DisplayName("Department must update successfully")
         void shouldUpdateDepartment() {
             Department department = mockDepartmentFound(uuid);
-            DepartmentRequestDTOs.Update updateDTO = new DepartmentRequestDTOs.Update("Sales Department");
+            DepartmentRequestDTOs.DepartmentUpdate departmentUpdateDTO = new DepartmentRequestDTOs.DepartmentUpdate("Sales Department");
 
-            var answer = service.update(uuid, updateDTO.name());
+            var answer = service.update(uuid, departmentUpdateDTO.name());
 
             assertThat(answer).isNotNull();
             assertThat(answer.getUuid()).isEqualTo(department.getUuid());
-            assertThat(answer.getName()).isEqualTo(updateDTO.name());
+            assertThat(answer.getName()).isEqualTo(departmentUpdateDTO.name());
         }
     }
 

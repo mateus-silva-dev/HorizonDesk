@@ -6,7 +6,6 @@ import io.github.mateussilvadev.horizondesk.exception.Code;
 import io.github.mateussilvadev.horizondesk.exception.EntityNotFoundException;
 import io.github.mateussilvadev.horizondesk.mapper.DepartmentMapper;
 import io.github.mateussilvadev.horizondesk.model.domain.Department;
-import io.github.mateussilvadev.horizondesk.model.domain.User;
 import io.github.mateussilvadev.horizondesk.repository.DepartmentRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +25,7 @@ public class DepartmentService {
     }
 
     @Transactional
-    public Department create(DepartmentRequestDTOs.Create dto) {
+    public Department create(DepartmentRequestDTOs.DepartmentCreate dto) {
         checkDepartmentExists(dto.name());
         Department department = DepartmentMapper.toDepartment(dto);
         return repository.save(department);
@@ -41,6 +40,7 @@ public class DepartmentService {
     @Transactional
     public Department update(UUID uuid, String newName) {
         Department department = findByUuid(uuid);
+        checkDepartmentExists(newName);
         department.changeDepartmentName(newName);
         return department;
     }

@@ -9,7 +9,7 @@ public final class DepartmentRequestDTOs {
 
     private DepartmentRequestDTOs() { }
 
-    public record Create(
+    public record DepartmentCreate(
             @NotNull(message = "Name is required.")
             @NotBlank(message = "Name is required.")
             @Size(min = 2, max = 50, message = "The name must contain at least 2 characters.")
@@ -17,7 +17,7 @@ public final class DepartmentRequestDTOs {
             String name
     ) { }
 
-    public record Update(
+    public record DepartmentUpdate(
             @NotNull(message = "Name is required.")
             @NotBlank(message = "Name is required.")
             @Size(min = 2, max = 50, message = "The name must contain at least 2 characters.")

@@ -6,7 +6,7 @@ public final class DepartmentResponseDTOs {
 
     private DepartmentResponseDTOs() { }
 
-    public record Response(UUID uuid, String name, boolean active) { }
+    public record DepartmentResponse(UUID uuid, String name, boolean active) { }
 
-    public record Options(UUID uuid, String name) { }
+    public record DepartmentOptions(UUID uuid, String name) { }
 }
