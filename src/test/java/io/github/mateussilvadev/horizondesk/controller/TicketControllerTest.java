@@ -76,7 +76,9 @@ public class TicketControllerTest {
     @Test
     @DisplayName("Should return 400 for general business rules")
     void shouldReturn400ForGeneralBusinessException() throws Exception {
+ feat/ticket
         var request = new TicketRequestDTOs.TicketCreate(faker.lorem().characters(150), PriorityTicket.LOW, mockUser.getUuid());
+
 
         given(service.create(any(TicketRequestDTOs.TicketCreate.class))).willThrow(
                 new BusinessException(Code.MALFORMED_JSON, "error.invalid_json"));
