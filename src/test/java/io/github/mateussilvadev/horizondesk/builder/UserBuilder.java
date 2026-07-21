@@ -29,7 +29,7 @@ public class UserBuilder {
 
     private UserBuilder() {
         this.uuid = UUID.randomUUID();
-        this.name = faker.name().fullName().replace(".", "");;
+        this.name = faker.name().fullName().replace(".", "");
         this.email = faker.internet().emailAddress();
         this.passwordHash = faker.credentials().password();
         this.role = Role.ROLE_CUSTOMER;
