@@ -63,7 +63,6 @@ public class Department {
         return new Department(name);
     }
 
-
     public void changeDepartmentName(String newName) {
         checkActive();
         String validateName = checkName(newName);
@@ -90,5 +89,16 @@ public class Department {
         if (!validateName.matches("^[A-Za-zÀ-ÿ.\\s'\\-]+$"))
             throw new BusinessException(Code.BUSINESS_RULE, "department.error.invalid_name", new Object[]{"department.field.name"});
         return validateName;
+    }
+
+    @Override
+    public String toString() {
+        return "Department[" +
+                "id=" + id +
+                ", uuid=" + uuid +
+                ", name='" + name + '\'' +
+                ", active=" + active +
+                ", createdAt=" + createdAt +
+                ']';
     }
 }
