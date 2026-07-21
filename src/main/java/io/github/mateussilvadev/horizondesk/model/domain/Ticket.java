@@ -133,13 +133,15 @@ public class Ticket implements Serializable {
     }
 
     public void resolve() {
-        this.status.transitionTo(StatusTicket.RESOLVED);
-        this.status = StatusTicket.RESOLVED;
+        changeStatus(StatusTicket.RESOLVED);
+    }
+
+    public void reopen() {
+        changeStatus(StatusTicket.IN_PROGRESS);
     }
 
     public void close() {
-        this.status.transitionTo(StatusTicket.CLOSED);
-        this.status = StatusTicket.CLOSED;
+        changeStatus(StatusTicket.CLOSED);
     }
 
     private void changeStatus(StatusTicket newStatus) {
@@ -163,4 +165,15 @@ public class Ticket implements Serializable {
             throw new BusinessException(Code.TICKET_ALREADY_CLOSED, "ticket.error.ticket_already_closed");
     }
 
+    @Override
+    public String toString() {
+        return "Ticket[" +
+                "id=" + id +
+                ", uuid=" + uuid +
+                ", title='" + title + '\'' +
+                ", priority=" + priority +
+                ", status=" + status +
+                ", createdAt=" + createdAt +
+                ']';
+    }
 }

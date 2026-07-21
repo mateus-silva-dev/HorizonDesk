@@ -82,6 +82,13 @@ public class TicketController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{uuid}/reopen")
+    @ApiDocPatch
+    public ResponseEntity<Void> reopenTicket(@PathVariable UUID uuid) {
+        service.reopenTicket(uuid);
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping("/{uuid}/close")
     @ApiDocPatch
     public ResponseEntity<Void> closeTicket(@PathVariable UUID uuid) {

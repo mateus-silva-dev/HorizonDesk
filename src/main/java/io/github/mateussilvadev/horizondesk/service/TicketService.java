@@ -76,6 +76,12 @@ public class TicketService {
     }
 
     @Transactional
+    public void reopenTicket(UUID uuid) {
+        Ticket ticket = findByUuid(uuid);
+        ticket.reopen();
+    }
+
+    @Transactional
     public void closeTicket(UUID uuid) {
         Ticket ticket = findByUuid(uuid);
         ticket.close();
