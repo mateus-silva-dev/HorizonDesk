@@ -78,7 +78,6 @@ public class TicketControllerTest {
     void shouldReturn400ForGeneralBusinessException() throws Exception {
         var request = new TicketRequestDTOs.TicketCreate(faker.lorem().characters(150), PriorityTicket.LOW, mockUser.getUuid());
 
-
         given(service.create(any(TicketRequestDTOs.TicketCreate.class))).willThrow(
                 new BusinessException(Code.MALFORMED_JSON, "error.invalid_json"));
 
