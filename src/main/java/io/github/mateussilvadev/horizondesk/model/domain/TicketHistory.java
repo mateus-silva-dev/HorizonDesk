@@ -67,7 +67,7 @@ public class TicketHistory {
     }
 
     public static TicketHistory assignTechnician(Ticket ticket, User actor, User technician) {
-        return new TicketHistory(ticket, TicketHistoryType.TECHNICIAN_ASSIGNED, null, null, technician.getName());
+        return new TicketHistory(ticket, TicketHistoryType.TECHNICIAN_ASSIGNED, actor, null, technician.getName());
     }
 
     public static TicketHistory changePriority(Ticket ticket, User actor, PriorityTicket oldPriority, PriorityTicket newPriority) {

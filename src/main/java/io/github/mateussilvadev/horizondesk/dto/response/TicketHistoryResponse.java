@@ -7,8 +7,8 @@ import java.util.UUID;
 
 public record TicketHistoryResponse(
         UUID uuid,
-        //TicketHistoryType type,
+        TicketHistoryType type,
         String message,
-        //UUID actorUuid,
-        String actorName ) { }
-        //LocalDateTime createdAt) { }
+        UUID actorUuid,
+        String actorName,
+        LocalDateTime createdAt) { }

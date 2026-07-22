@@ -30,11 +30,11 @@ public class TicketHistoryMapper {
 
         return new TicketHistoryResponse(
                 history.getUuid(),
-                //history.getType(),
+                history.getType(),
                 resolveMessage(history),
-                //actor != null ? actor.getUuid() : null,
-                actor != null ? actor.getName() : null);
-                //history.getCreatedAt());
+                actor != null ? actor.getUuid() : null,
+                actor != null ? actor.getName() : null,
+                history.getCreatedAt());
     }
 
     public List<TicketHistoryResponse> toResponseList(List<TicketHistory> histories) {
