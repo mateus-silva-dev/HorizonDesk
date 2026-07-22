@@ -5,12 +5,17 @@ import io.github.mateussilvadev.horizondesk.builder.TicketBuilder;
 import io.github.mateussilvadev.horizondesk.builder.UserBuilder;
 import io.github.mateussilvadev.horizondesk.dto.request.TicketFilter;
 import io.github.mateussilvadev.horizondesk.dto.request.TicketRequestDTOs;
+import io.github.mateussilvadev.horizondesk.dto.response.TicketHistoryResponse;
 import io.github.mateussilvadev.horizondesk.exception.BusinessException;
 import io.github.mateussilvadev.horizondesk.exception.Code;
 import io.github.mateussilvadev.horizondesk.exception.EntityNotFoundException;
+import io.github.mateussilvadev.horizondesk.mapper.TicketHistoryMapper;
 import io.github.mateussilvadev.horizondesk.model.domain.Ticket;
+import io.github.mateussilvadev.horizondesk.model.domain.TicketHistory;
 import io.github.mateussilvadev.horizondesk.model.domain.User;
 import io.github.mateussilvadev.horizondesk.model.enums.PriorityTicket;
+import io.github.mateussilvadev.horizondesk.model.enums.TicketHistoryType;
+import io.github.mateussilvadev.horizondesk.service.TicketHistoryService;
 import io.github.mateussilvadev.horizondesk.service.TicketService;
 import net.datafaker.Faker;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +32,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -37,8 +43,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TicketController.class)
 @DisplayName("TicketController test")
@@ -52,6 +57,12 @@ public class TicketControllerTest {
 
     @MockitoBean
     private TicketService service;
+
+    @MockitoBean
+    private TicketHistoryService historyService;
+
+    @MockitoBean
+    private TicketHistoryMapper mapper;
 
     @MockitoBean
     private MessageSource messageSource;
@@ -219,6 +230,60 @@ public class TicketControllerTest {
 
         verify(service, times(1)).findAllPaginated(any(TicketFilter.class), any(Pageable.class));
     }
+
+    @Test
+    @DisplayName("Should return 200 and list of comments")
+    void shouldReturnTicketHistory() throws Exception {
+        TicketHistory firstHistory = mock(TicketHistory.class);
+        TicketHistory secondHistory = mock(TicketHistory.class);
+
+        List<TicketHistory> histories = List.of(firstHistory, secondHistory);
+
+        UUID firstUuid = UUID.randomUUID();
+        UUID secondUuid = UUID.randomUUID();
+        UUID actorUuid = UUID.randomUUID();
+
+        TicketHistoryResponse firstResponse =
+                new TicketHistoryResponse(
+                        firstUuid, TicketHistoryType.OPENED, "Ticket opened by Ana Clara", actorUuid,
+                        "Ana Clara", LocalDateTime.of(2026, 7, 23, 10, 0));
+
+        TicketHistoryResponse secondResponse =
+                new TicketHistoryResponse(secondUuid,
+                        TicketHistoryType.TECHNICIAN_ASSIGNED, "Ticket assigned to technician Maria Alice", null, null,
+                        LocalDateTime.of(2026, 7, 23, 10, 5));
+
+        when(historyService.findByTicketUuid(uuid))
+                .thenReturn(histories);
+
+        when(mapper.toResponseList(histories))
+                .thenReturn(List.of(firstResponse, secondResponse));
+
+        mockMvc.perform(get(BASE_URL + "/{uuid}/history", uuid)
+                                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.length()").value(2))
+
+
+                .andExpect(jsonPath("$[0].uuid").value(firstUuid.toString()))
+                .andExpect(jsonPath("$[0].type").value("OPENED"))
+                .andExpect(jsonPath("$[0].message").value("Ticket opened by Ana Clara"))
+                .andExpect(jsonPath("$[0].actorUuid").value(actorUuid.toString()))
+                .andExpect(jsonPath("$[0].actorName").value("Ana Clara"))
+                .andExpect(jsonPath("$[0].createdAt").exists())
+
+                .andExpect(jsonPath("$[1].uuid").value(secondUuid.toString()))
+                .andExpect(jsonPath("$[1].type").value("TECHNICIAN_ASSIGNED"))
+                .andExpect(jsonPath("$[1].message").value("Ticket assigned to technician Maria Alice"))
+                .andExpect(jsonPath("$[1].actorUuid").doesNotExist())
+                .andExpect(jsonPath("$[1].actorName").doesNotExist())
+                .andExpect(jsonPath("$[1].createdAt").exists());
+
+        verify(historyService).findByTicketUuid(uuid);
+        verify(mapper).toResponseList(histories);
+    }
+
 
     private void assertTicketResponse(ResultActions actions, Ticket ticket) throws Exception {
         actions
