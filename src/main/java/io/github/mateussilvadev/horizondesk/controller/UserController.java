@@ -1,9 +1,5 @@
 package io.github.mateussilvadev.horizondesk.controller;
 
-import io.github.docflowlib.docflow.annotations.ApiDocController;
-import io.github.docflowlib.docflow.annotations.ApiDocGet;
-import io.github.docflowlib.docflow.annotations.ApiDocPatch;
-import io.github.docflowlib.docflow.annotations.ApiDocPost;
 import io.github.mateussilvadev.horizondesk.dto.request.UserRequestDTOs;
 import io.github.mateussilvadev.horizondesk.dto.response.PageResponse;
 import io.github.mateussilvadev.horizondesk.dto.response.UserResponseDTOs;
@@ -23,7 +19,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@ApiDocController
 public class UserController {
 
     private final UserService userService;
@@ -33,7 +28,6 @@ public class UserController {
     }
 
     @PostMapping
-    @ApiDocPost
     public ResponseEntity<UserResponseDTOs.UserResponse> createUser(@Valid @RequestBody UserRequestDTOs.UserCreate dto) {
         User savedUser = userService.create(dto);
         UserResponseDTOs.UserResponse userResponse = UserMapper.toResponse(savedUser);
@@ -45,7 +39,6 @@ public class UserController {
     }
 
     @GetMapping("/{uuid}")
-    @ApiDocGet
     public ResponseEntity<UserResponseDTOs.UserResponse> getByUUID(@PathVariable UUID uuid) {
         User user = userService.findByUuid(uuid);
         return ResponseEntity.ok(UserMapper.toResponse(user));
@@ -53,21 +46,18 @@ public class UserController {
 
 
     @PatchMapping("/{uuid}")
-    @ApiDocPatch
     public ResponseEntity<UserResponseDTOs.UserResponse> updateUser(@PathVariable UUID uuid, @Valid @RequestBody UserRequestDTOs.UserUpdate dto) {
         User user = userService.updateUser(uuid, dto);
         return ResponseEntity.ok(UserMapper.toResponse(user));
     }
 
     @PatchMapping("/{uuid}/password")
-    @ApiDocPatch
     public ResponseEntity<Void> updatePassword(@PathVariable UUID uuid, @Valid @RequestBody UserRequestDTOs.UpdatePassword dto) {
         userService.changePassword(uuid, dto);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{uuid}/exclusion-request")
-    @ApiDocPatch
     public ResponseEntity<Void> exclusionRequest(@PathVariable UUID uuid) {
         userService.requestAccountExclusion(uuid);
         return ResponseEntity.noContent().build();
@@ -75,36 +65,30 @@ public class UserController {
 
 
     @PatchMapping("/{uuid}/role")
-    @ApiDocPatch
     public ResponseEntity<Void> changeRole(@PathVariable UUID uuid, @Valid @RequestBody UserRequestDTOs.ChangeRole dto) {
         userService.changeRole(uuid, dto.role());
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{uuid}/department")
-    @ApiDocPatch
     public ResponseEntity<Void> changeDepartment(@PathVariable UUID uuid, @Valid @RequestBody UserRequestDTOs.ChangeDepartment dto) {
         userService.changeDepartment(uuid, dto.departmentUuid());
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{uuid}/activate")
-    @ApiDocPatch
     public ResponseEntity<Void> activateUser(@PathVariable UUID uuid) {
         userService.activate(uuid);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{uuid}/deactivate")
-    @ApiDocPatch
     public ResponseEntity<Void> deactivateUser(@PathVariable UUID uuid) {
         userService.deactivate(uuid);
         return ResponseEntity.noContent().build();
     }
 
-
     @GetMapping("/technicians")
-    @ApiDocGet
     public ResponseEntity<PageResponse<UserResponseDTOs.TechnicianOption>> getActiveTechnicians(
             @PageableDefault(size = 20, sort = "name") Pageable pageable) {
         Page<User> page =

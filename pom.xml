@@ -75,7 +75,7 @@
 		<dependency>
 			<groupId>io.github.docflow-lib</groupId>
 			<artifactId>docflow-spring-boot-starter</artifactId>
-			<version>1.0.0</version>
+			<version>3.0.0</version>
 		</dependency>
 
 		<!-- ================================================================= -->
@@ -127,7 +127,7 @@
 			<groupId>net.datafaker</groupId>
 			<artifactId>datafaker</artifactId>
 			<version>2.5.4</version>
-			<scope>test</scope> <!-- Alterado para scope test, pois é usado apenas em fábricas de teste -->
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>uk.org.webcompere</groupId>
