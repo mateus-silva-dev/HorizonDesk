@@ -1,9 +1,5 @@
 package io.github.mateussilvadev.horizondesk.controller;
 
-import io.github.docflowlib.docflow.annotations.ApiDocController;
-import io.github.docflowlib.docflow.annotations.ApiDocGet;
-import io.github.docflowlib.docflow.annotations.ApiDocPatch;
-import io.github.docflowlib.docflow.annotations.ApiDocPost;
 import io.github.mateussilvadev.horizondesk.dto.request.DepartmentRequestDTOs;
 import io.github.mateussilvadev.horizondesk.dto.response.DepartmentResponseDTOs;
 import io.github.mateussilvadev.horizondesk.dto.response.PageResponse;
@@ -24,7 +20,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/departments")
-@ApiDocController
 public class DepartmentController {
 
     private final DepartmentService service;
@@ -34,7 +29,6 @@ public class DepartmentController {
     }
 
     @PostMapping
-    @ApiDocPost
     public ResponseEntity<DepartmentResponseDTOs.DepartmentResponse> create(@RequestBody @Valid DepartmentRequestDTOs.DepartmentCreate dto) {
         Department savedDepartment = service.create(dto);
         DepartmentResponseDTOs.DepartmentResponse departmentResponse = DepartmentMapper.toResponse(savedDepartment);
@@ -46,7 +40,6 @@ public class DepartmentController {
     }
 
     @GetMapping("/{uuid}")
-    @ApiDocGet
     public ResponseEntity<DepartmentResponseDTOs.DepartmentResponse> getByUUID(@PathVariable UUID uuid) {
         Department department = service.findByUuid(uuid);
         return ResponseEntity.ok(DepartmentMapper.toResponse(department));
@@ -54,28 +47,24 @@ public class DepartmentController {
 
 
     @PatchMapping("/{uuid}")
-    @ApiDocPatch
     public ResponseEntity<DepartmentResponseDTOs.DepartmentResponse> update(@PathVariable UUID uuid, @Valid @RequestBody DepartmentRequestDTOs.DepartmentUpdate dto) {
         Department department = service.update(uuid, dto.name());
         return ResponseEntity.ok(DepartmentMapper.toResponse(department));
     }
 
     @PatchMapping("/{uuid}/activate")
-    @ApiDocPatch
     public ResponseEntity<Void> activate(@PathVariable UUID uuid) {
         service.activate(uuid);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{uuid}/deactivate")
-    @ApiDocPatch
     public ResponseEntity<Void> deactivate(@PathVariable UUID uuid) {
         service.deactivate(uuid);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    @ApiDocGet
     public ResponseEntity<PageResponse<DepartmentResponseDTOs.DepartmentResponse>> getAll(
             @PageableDefault(size = 20, sort = "name") Pageable page) {
         Page<Department> pagedDepartments = service.findAll(page);
@@ -83,7 +72,6 @@ public class DepartmentController {
     }
 
     @GetMapping("/options")
-    @ApiDocGet
     public ResponseEntity<List<DepartmentResponseDTOs.DepartmentOptions>> getActiveOptions() {
         List<Department> departments = service.findAllActiveOptions();
         return ResponseEntity.ok(
